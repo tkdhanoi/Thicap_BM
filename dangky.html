@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ĐĂNG KÝ THI</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- SheetJS for Excel importing/exporting -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --primary-hover: #0b5ed7;
+            --success-color: #198754;
+            --success-hover: #157347;
+            --danger-color: #dc3545;
+            --bg-body: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dee2e6;
+            --table-header-bg: #f8f9fa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-color);
+            padding: 5px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            padding: 10px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Form Wrapper */
+        .form-body {
+            padding: 15px;
+        }
+
+        .section-box {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FF0000;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        /* Grid Mục 1 */
+        .section-1-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 850px) {
+            .section-1-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .form-label span.required {
+            color: var(--danger-color);
+        }
+
+        .form-group-inline {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-group-inline .form-label {
+            margin-bottom: 0;
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background-color: #fff;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Radio Options */
+        .radio-group {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .radio-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .radio-label input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-group-left {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: var(--success-hover);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline-primary {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: transparent;
+            color: var(--danger-color);
+            padding: 6px 10px;
+        }
+        .btn-danger:hover {
+            background-color: #f8d7da;
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #f1f4f8;
+            color: #334155;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 12px 10px;
+            border-bottom: 2px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .stt-col {
+            text-align: center;
+            font-weight: 700;
+            width: 50px;
+        }
+
+        /* Section 3 Layout */
+        .member-lookup-grid {
+            display: grid;
+            grid-template-columns: 1fr 2.2fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 850px) {
+            .member-lookup-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .lookup-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .result-box {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 200px;
+        }
+
+        .badge-cap {
+            background-color: #6c757d;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 11px;
+            display: inline-block;
+        }
+
+        .vtf-id-text {
+            color: #0b5ed7;
+            font-weight: 700;
+        }
+
+        /* Footer / Submit */
+        .submit-section {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-submit {
+            padding: 12px 40px;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        .empty-placeholder {
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .hidden-file-input {
+            display: none;
+        }
+
+        /* Modal Overlay & Dialog Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalSlideDown 0.3s ease;
+            overflow: hidden;
+        }
+
+        @keyframes modalSlideDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            background-color: #f8d7da;
+            color: #842029;
+            border-bottom: 1px solid #f5c2c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #842029;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: right;
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>ĐĂNG KÝ THI</h1>
+    </div>
+
+    <!-- Form Content -->
+    <div class="form-body">
+        <form id="registrationForm" onsubmit="event.preventDefault(); handleSubmit();">
+            
+            <!-- 1/ Điểm tập & Tra Mã hội viên -->
+            <div class="section-box">
+                <div class="section-title">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span>1. Điểm tập & Tra mã hội viên</span>
+                </div>
+                
+                <div class="section-1-grid">
+                    <!-- Cột 1: Chọn điểm tập -->
+                    <div>
+                        <label class="form-label" for="diemTapSelect">Chọn Điểm tập <span class="required">*</span></label>
+                        <select class="form-select" id="diemTapSelect" required>
+                            <option value="" disabled selected>-- Chọn --</option>
+                            <option value="75HM">75HM</option>
+                            <option value="HUBT">HUBT</option>
+                            <option value="USSH">USSH</option>
+                        </select>
+                    </div>
+
+                    <!-- Cột 2: Tra mã hội viên -->
+                    <div class="lookup-box">
+                        <label class="form-label" for="searchNamesTextarea">Tra mã hội viên</label>
+                        <textarea class="form-control" id="searchNamesTextarea" placeholder="Nguyễn Văn A&#10;... Có thể xuống dòng hoặc phân cách bởi dấu phẩy"></textarea>
+                        <button type="button" class="btn btn-primary" id="btnSearchNames" onclick="searchVtfByNames()" style="width: 100%; justify-content: center;">
+                            <i class="fa-solid fa-magnifying-glass"></i> Tra cứu
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Khung hiển thị kết quả tìm kiếm danh sách bên dưới -->
+                <div id="searchNameResultContainer" style="margin-top: 10px;"></div>
+            </div>
+
+            <!-- 2/ Võ sinh mới -->
+            <div class="section-box" id="section-new-students">
+                <div class="section-title">
+                    <i class="fa-solid fa-users"></i>
+                    <span>2. Võ sinh mới (Chưa có mã hội viên)</span>
+                </div>
+
+                <!-- Lựa chọn Có / Không cùng 1 dòng, Mặc định chọn Không -->
+                <div class="form-group form-group-inline" style="margin-bottom: 20px;">
+                    <label class="form-label">Đăng ký mã võ sinh mới <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="hasNewStudents" value="no" checked onchange="toggleNewStudentsSection(false)"> Không
+                        </label>                        
+                        <label class="radio-label">
+                            <input type="radio" name="hasNewStudents" value="yes" onchange="toggleNewStudentsSection(true)"> Có
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Khung nhập Võ sinh mới (Mặc định ẩn) -->
+                <div id="newStudentsContainer" style="display: none;">
+                    <div class="toolbar">
+                        <div class="btn-group-left">
+                            <button type="button" class="btn btn-success" onclick="downloadExcelTemplate()">
+                                <i class="fa-solid fa-download"></i> Tải File Mẫu
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="triggerExcelImport()">
+                                <i class="fa-solid fa-file-excel"></i> Nhập từ Excel
+                            </button>
+                            <input type="file" id="excelFileInput" class="hidden-file-input" accept=".xlsx, .xls, .csv" onchange="handleExcelImport(event)">
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" onclick="addNewRow()">
+                            <i class="fa-solid fa-plus"></i> Thêm 1 dòng
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="newStudentsTable">
+                            <thead>
+                                <tr>
+                                    <th class="stt-col">STT</th>
+                                    <th>HỌ VÀ TÊN <span class="required">*</span></th>
+                                    <th>NGÀY SINH <span class="required">*</span></th>
+                                    <th>GIỚI TÍNH <span class="required">*</span></th>
+                                    <th>CCCD</th>
+                                    <th>ĐỊA CHỈ</th>
+                                    <th>VĂN HÓA</th>
+                                    <th style="text-align: center; width: 60px;"><i class="fa-solid fa-gear"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="newStudentsTbody">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3/ Võ sinh đã có mã hội viên -->
+            <div class="section-box" id="section-existing-students">
+                <div class="section-title">
+                    <i class="fa-solid fa-id-badge"></i>
+                    <span>3. Võ sinh đã có mã hội viên (VTF ID)</span>
+                </div>
+
+                <div class="member-lookup-grid">
+                    <!-- Column 1: Input -->
+                    <div class="lookup-box">
+                        <label class="form-label" for="vtfIdTextarea">Dán danh sách mã hội viên</label>
+                        <textarea class="form-control" id="vtfIdTextarea" style="min-height: 180px;" placeholder="V26-123456&#10;... Có thể xuống dòng hoặc dấu phẩy"></textarea>
+                        <button type="button" class="btn btn-primary" id="btnVerify" style="width: 100%; justify-content: center;" onclick="verifyVtfIds()">
+                            <i class="fa-solid fa-shield-halved"></i> Kiểm tra mã & cấp dự thi
+                        </button>
+                    </div>
+
+                    <!-- Column 2: Output -->
+                    <div class="result-box">
+                        <div id="vtfResultContainer">
+                            <div class="empty-placeholder">
+                                Dữ liệu sẽ hiện ở đây sau khi kiểm tra...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+                <button type="submit" class="btn btn-primary btn-submit" id="btnSubmit">
+                    <i class="fa-solid fa-paper-plane"></i> Gửi Đăng Ký
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- Modal Nổi Cảnh Báo Mã Không Hợp Lệ -->
+<div id="invalidModal" class="modal-overlay" onclick="if(event.target === this) closeInvalidModal();">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> CẢNH BÁO MÃ KHÔNG HỢP LỆ</h3>
+            <button type="button" class="modal-close-btn" onclick="closeInvalidModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="invalidModalBody">
+            <!-- Dynamic Content -->
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="closeInvalidModal()">Đã hiểu / Đóng</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // URL Web App Google Apps Script
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwgFdtQfR6piBF8j1Yk7GkJni3GAwG9p9AX88fCzsnNyR1NEB5QzQM46HWSGxnp2rVY/exec";
+
+    // Khởi tạo 2 dòng mặc định cho phần võ sinh mới
+    window.onload = function() {
+        for (let i = 0; i < 2; i++) {
+            addNewRow();
+        }
+    };
+
+    // Bật/tắt khu vực Võ sinh mới
+    function toggleNewStudentsSection(show) {
+        const container = document.getElementById('newStudentsContainer');
+        container.style.display = show ? 'block' : 'none';
+    }
+
+    // Định dạng ngày sinh dd/mm/yyyy
+    function formatDobInput(input) {
+        let v = input.value.replace(/\D/g, '');
+        if (v.length > 8) v = v.substring(0, 8);
+        if (v.length > 4) {
+            input.value = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4)}`;
+        } else if (v.length > 2) {
+            input.value = `${v.substring(0, 2)}/${v.substring(2)}`;
+        } else {
+            input.value = v;
+        }
+    }
+
+    // Chuẩn hóa ngày sinh về dd/mm/yyyy
+    function formatDateToDDMMYYYY(val) {
+        if (!val) return '';
+        val = String(val).trim();
+
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val)) {
+            const parts = val.split('/');
+            const day = parts[0].padStart(2, '0');
+            const month = parts[1].padStart(2, '0');
+            return `${day}/${month}/${parts[2]}`;
+        }
+
+        const d = new Date(val);
+        if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        return val;
+    }
+
+    // Thêm 1 dòng võ sinh mới
+    function addNewRow(data = {}) {
+        const tbody = document.getElementById('newStudentsTbody');
+        const rowCount = tbody.children.length + 1;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="stt-col">${rowCount}</td>
+            <td><input type="text" class="form-control input-name" placeholder="Nhập họ tên..." value="${data.name || ''}"></td>
+            <td><input type="text" class="form-control input-dob" placeholder="dd/mm/yyyy" value="${data.dob || ''}" oninput="formatDobInput(this)" maxlength="10"></td>
+            <td>
+                <select class="form-select input-gender">
+                    <option value="" ${!data.gender ? 'selected' : ''}>Chọn</option>
+                    <option value="Nam" ${data.gender === 'Nam' ? 'selected' : ''}>Nam</option>
+                    <option value="Nữ" ${data.gender === 'Nữ' ? 'selected' : ''}>Nữ</option>
+                </select>
+            </td>
+            <td><input type="text" class="form-control input-cccd" placeholder="Số CCCD..." value="${data.cccd || ''}" maxlength="12" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13)"></td>
+            <td><input type="text" class="form-control input-address" placeholder="Tỉnh/Thành phố..." value="${data.address || ''}"></td>
+            <td>
+                <select class="form-select input-culture">
+                    <option value="" ${!data.culture ? 'selected' : ''}>Chọn</option>
+                    <option value="Mầm non" ${data.culture === 'Mầm non' ? 'selected' : ''}>Mầm non</option>
+                    <option value="Tiểu học" ${data.culture === 'Tiểu học' ? 'selected' : ''}>Tiểu học</option>
+                    <option value="THCS" ${data.culture === 'THCS' ? 'selected' : ''}>THCS</option>
+                    <option value="THPT" ${data.culture === 'THPT' ? 'selected' : ''}>THPT</option>
+                    <option value="Đại học" ${data.culture === 'Đại học' ? 'selected' : ''}>Đại học</option>
+                    <option value="Khác" ${data.culture === 'Khác' ? 'selected' : ''}>Khác</option>
+                </select>
+            </td>
+            <td style="text-align: center;">
+                <button type="button" class="btn btn-danger" onclick="deleteRow(this)" title="Xóa dòng">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        updateSTT();
+    }
+
+    // Xóa dòng võ sinh mới
+    function deleteRow(btn) {
+        const tbody = document.getElementById('newStudentsTbody');
+        if (tbody.children.length <= 1) {
+            alert("Danh sách phải có ít nhất 1 dòng!");
+            return;
+        }
+        const row = btn.closest('tr');
+        row.remove();
+        updateSTT();
+    }
+
+    // Cập nhật lại STT
+    function updateSTT() {
+        const rows = document.querySelectorAll('#newStudentsTbody tr');
+        rows.forEach((row, index) => {
+            row.querySelector('.stt-col').textContent = index + 1;
+        });
+    }
+
+    // Tải mẫu Excel
+    function downloadExcelTemplate() {
+        const sampleData = [
+            ["HỌ VÀ TÊN", "NGÀY SINH", "GIỚI TÍNH", "CCCD", "ĐỊA CHỈ", "VĂN HÓA"],
+            ["Nguyễn Văn A", "12/05/2012", "Nam", "001202001234", "Hà Nội", "Tiểu học"],
+            ["Trần Thị B", "20/08/2010", "Nữ", "001204005678", "Hà Nội", "THCS"]
+        ];
+
+        const ws = XLSX.utils.aoa_to_sheet(sampleData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Mau_Dang_Ky");
+        XLSX.writeFile(wb, "Dang_Ky_Vo_Sinh_Moi.xlsx");
+    }
+
+    function triggerExcelImport() {
+        document.getElementById('excelFileInput').click();
+    }
+
+    // Nhập từ Excel
+    function handleExcelImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            const json = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
+
+            if (json.length <= 1) {
+                alert("File không có dữ liệu!");
+                return;
+            }
+
+            document.getElementById('newStudentsTbody').innerHTML = '';
+
+            for (let i = 1; i < json.length; i++) {
+                const row = json[i];
+                if (row.length === 0 || !row[0]) continue;
+
+                const rawCccd = String(row[3] || '').replace(/\D/g, '').slice(0, 13);
+
+                addNewRow({
+                    name: row[0] || '',
+                    dob: formatDateToDDMMYYYY(row[1] || ''),
+                    gender: row[2] || '',
+                    cccd: rawCccd,
+                    address: row[4] || '',
+                    culture: row[5] || ''
+                });
+            }
+            alert("Nhập thành công dữ liệu từ Excel!");
+            event.target.value = '';
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // Phân tách chuỗi từ Textarea thành mảng độc lập
+    function parseInputTextarea(text) {
+        if (!text) return [];
+        const rawList = text.split(/[\n,;|\r]+/);
+        const result = [];
+        const seen = new Set();
+
+        rawList.forEach(item => {
+            const trimmed = item.trim();
+            if (trimmed.length > 0) {
+                const lower = trimmed.toLowerCase();
+                if (!seen.has(lower)) {
+                    seen.add(lower);
+                    result.push(trimmed);
+                }
+            }
+        });
+
+        return result;
+    }
+
+    // Trích xuất mảng dữ liệu Võ sinh tra cứu từ phản hồi API
+    function extractCoMaList(apiData) {
+        if (Array.isArray(apiData)) return apiData;
+        if (apiData && Array.isArray(apiData.danhSachID)) return apiData.danhSachID;
+        if (apiData && Array.isArray(apiData.voSinhCoMa)) return apiData.voSinhCoMa;
+        return [];
+    }
+
+    // 1. TRA CỨU MÃ VÕ SINH THEO HỌ TÊN VÀ ĐIỂM TẬP (MỤC 1)
+    async function searchVtfByNames() {
+        const diemTap = document.getElementById('diemTapSelect').value;
+        const textInput = document.getElementById('searchNamesTextarea').value;
+        const container = document.getElementById('searchNameResultContainer');
+        const btnSearch = document.getElementById('btnSearchNames');
+
+        if (!diemTap) {
+            alert('Vui lòng chọn Điểm tập trước khi tra cứu!');
+            document.getElementById('diemTapSelect').focus();
+            return;
+        }
+
+        const nameQueries = parseInputTextarea(textInput);
+
+        if (nameQueries.length === 0) {
+            alert('Vui lòng điền hoặc dán ít nhất 1 họ tên võ sinh!');
+            document.getElementById('searchNamesTextarea').focus();
+            return;
+        }
+
+        btnSearch.disabled = true;
+        btnSearch.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tra cứu...';
+        container.innerHTML = '<div style="font-size: 13px; color: var(--primary-color); padding: 10px 0;"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu và kiểm tra danh sách...</div>';
+
+        try {
+            const response = await fetch(GAS_WEB_APP_URL);
+            if (!response.ok) throw new Error("Không thể truy cập dữ liệu.");
+
+            const resJson = await response.json();
+            const rows = extractCoMaList(resJson);
+
+            if (!rows || rows.length === 0) {
+                container.innerHTML = '<div style="font-size: 13px; color: var(--danger-color);">Không có dữ liệu võ sinh có mã trên hệ thống.</div>';
+                return;
+            }
+
+            const diemTapKey = diemTap.toLowerCase().trim();
+
+            const locationStudents = rows.map(row => {
+                return {
+                    location: String(row[0] || '').trim(),
+                    id: String(row[1] || '').trim().toUpperCase(),
+                    name: String(row[2] || '').trim(),
+                    gender: row[3] || '---',
+                    dob: formatDateToDDMMYYYY(row[4] || ''),
+                    cap: row[5] || '---'
+                };
+            }).filter(s => s.location.toLowerCase().includes(diemTapKey));
+
+            const foundMatches = [];
+            const notFoundQueries = [];
+
+            nameQueries.forEach(qName => {
+                const qLower = qName.toLowerCase();
+                const matchedList = locationStudents.filter(s => s.name.toLowerCase().includes(qLower));
+
+                if (matchedList.length > 0) {
+                    matchedList.forEach(m => {
+                        if (!foundMatches.some(existing => existing.id === m.id)) {
+                            foundMatches.push(m);
+                        }
+                    });
+                } else {
+                    notFoundQueries.push(qName);
+                }
+            });
+
+            if (foundMatches.length === 0 && notFoundQueries.length === 0) {
+                container.innerHTML = `<div style="font-size: 13px; color: var(--danger-color);"><i class="fa-solid fa-circle-xmark"></i> Không tìm thấy võ sinh nào phù hợp.</div>`;
+                return;
+            }
+
+            let html = `<div style="background: #eef2f7; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">`;
+
+            if (foundMatches.length > 0) {
+                const foundIdsString = foundMatches.map(m => m.id).join('\n');
+                
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong style="color: #1e3c72; font-size: 14px;"><i class="fa-solid fa-circle-check" style="color: var(--success-color);"></i> Tìm thấy ${foundMatches.length} võ sinh:</strong>
+                        <button type="button" class="btn btn-sm btn-success" onclick="copyIdsToSection3(\`${foundIdsString}\`)">
+                            <i class="fa-solid fa-arrow-down"></i> Chuyển toàn bộ mã này vào Mục 3
+                        </button>
+                    </div>
+                    <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã VTF</th>
+                                    <th>Họ và tên</th>
+                                    <th>Giới tính</th>
+                                    <th>Ngày sinh</th>
+                                    <th>Cấp hiện tại</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                foundMatches.forEach((item, index) => {
+                    html += `
+                        <tr>
+                            <td class="stt-col">${index + 1}</td>
+                            <td class="vtf-id-text">${item.id}</td>
+                            <td><strong>${item.name}</strong></td>
+                            <td>${item.gender}</td>
+                            <td>${item.dob}</td>
+                            <td><span class="badge-cap">${item.cap}</span></td>
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table></div>`;
+            }
+
+            if (notFoundQueries.length > 0) {
+                html += `
+                    <div style="margin-top: 12px; font-size: 13px; color: var(--danger-color); background: #fff5f5; padding: 10px; border-radius: 6px; border: 1px solid #feb2b2;">
+                        <strong><i class="fa-solid fa-triangle-exclamation"></i> Không tìm thấy (${notFoundQueries.length}):</strong> ${notFoundQueries.join(', ')}
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            container.innerHTML = html;
+
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = `<div style="font-size: 13px; color: var(--danger-color);"><i class="fa-solid fa-circle-xmark"></i> Lỗi tra cứu: ${error.message}</div>`;
+        } finally {
+            btnSearch.disabled = false;
+            btnSearch.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Tra cứu';
+        }
+    }
+
+    // Sao chép Mã VTF từ Mục 1 dán xuống Mục 3
+    function copyIdsToSection3(idsString) {
+        const textarea3 = document.getElementById('vtfIdTextarea');
+        const currentVal = textarea3.value.trim();
+        if (currentVal) {
+            textarea3.value = currentVal + '\n' + idsString;
+        } else {
+            textarea3.value = idsString;
+        }
+        document.getElementById('section-existing-students').scrollIntoView({ behavior: 'smooth' });
+        verifyVtfIds(); // Tự động kiểm tra luôn ở Mục 3
+    }
+
+    /* =================================================
+	Kiểm tra Cấp hiện tại (Chỉ từ Cấp 10 đến Cấp 2)
+       ================================================= */
+    function validateCurrentGrade(capStr) {
+        if (!capStr || capStr === '---') {
+            return { valid: false, reason: 'Chưa có thông tin Cấp hiện tại trên hệ thống' };
+        }
+
+        const str = String(capStr).trim();
+
+        if (/đẳng|dang/i.test(str)) {
+            return { 
+                valid: false, 
+                reason: `Cấp hiện tại không hợp lệ (${str}). Chỉ nhận từ Cấp 10 đến Cấp 2` 
+            };
+        }
+
+        const match = str.match(/\d+/);
+        if (match) {
+            const capNum = parseInt(match[0], 10);
+            if (capNum >= 2 && capNum <= 10) {
+                const suggestedNextCap = capNum > 2 ? `Cấp ${capNum - 1}` : 'Cấp 1';
+                return { valid: true, capNum: capNum, suggestedNextCap: suggestedNextCap };
+            } else {
+                return { 
+                    valid: false, 
+                    reason: `Cấp hiện tại không hợp lệ (${str}). Chỉ nhận từ Cấp 10 đến Cấp 2` 
+                };
+            }
+        }
+
+        return { valid: false, reason: `Cấp hiện tại không hợp lệ (${str}). Chỉ nhận từ Cấp 10 đến Cấp 2` };
+    }
+
+    /* =================================
+        Tạo danh sách Option Cấp dự thi
+       ================================= */
+    function generateCapOptions(selectedCap) {
+        const caps = ["Cấp 9", "Cấp 8", "Cấp 7", "Cấp 6", "Cấp 5", "Cấp 4", "Cấp 3", "Cấp 2", "Cấp 1"];
+        return caps.map(c => `<option value="${c}" ${c.toLowerCase() === String(selectedCap).toLowerCase() ? 'selected' : ''}>${c}</option>`).join('');
+    }
+
+    // 2. KIỂM TRA MÃ HỘI VIÊN (VTF ID) Ở MỤC 3
+    async function verifyVtfIds() {
+        const textInput = document.getElementById('vtfIdTextarea').value;
+        const container = document.getElementById('vtfResultContainer');
+        const btnVerify = document.getElementById('btnVerify');
+
+        const inputIds = parseInputTextarea(textInput).map(id => id.toUpperCase());
+
+        if (inputIds.length === 0) {
+            alert('Vui lòng dán ít nhất 1 mã VTF ID để kiểm tra!');
+            document.getElementById('vtfIdTextarea').focus();
+            return;
+        }
+
+        btnVerify.disabled = true;
+        btnVerify.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang đối soát mã...';
+        container.innerHTML = '<div style="font-size: 13px; color: var(--primary-color); text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Đang đối soát danh sách mã...</div>';
+
+        try {
+            const response = await fetch(GAS_WEB_APP_URL);
+            if (!response.ok) throw new Error("Không thể kết nối đến hệ thống.");
+
+            const resJson = await response.json();
+            const rows = extractCoMaList(resJson);
+
+            // Tạo Map tra cứu mã VTF ID
+            const vtfDatabaseMap = {};
+            rows.forEach(row => {
+                const idVal = String(row[1] || '').trim().toUpperCase();
+                if (idVal) {
+                    vtfDatabaseMap[idVal] = {
+                        location: String(row[0] || '').trim(),
+                        id: idVal,
+                        name: String(row[2] || '').trim(),
+                        gender: row[3] || '---',
+                        dob: formatDateToDDMMYYYY(row[4] || ''),
+                        cap: row[5] || '---'
+                    };
+                }
+            });
+
+            const validList = [];
+            const invalidList = [];
+
+            inputIds.forEach(inputId => {
+                const member = vtfDatabaseMap[inputId];
+                if (!member) {
+                    invalidList.push({ id: inputId, reason: 'Không tìm thấy thông tin mã VTF ID này trong hệ thống' });
+                } else {
+                    const gradeCheck = validateCurrentGrade(member.cap);
+                    if (!gradeCheck.valid) {
+                        invalidList.push({ id: inputId, reason: gradeCheck.reason });
+                    } else {
+                        validList.push({
+                            id: member.id,
+                            name: member.name,
+                            gender: member.gender,
+                            dob: member.dob,
+                            currentCap: member.cap,
+                            targetCap: gradeCheck.suggestedNextCap
+                        });
+                    }
+                }
+            });
+
+            /* ===============================================
+                Render Danh sách Hợp lệ kèm Select Cấp dự thi
+               =============================================== */
+            if (validList.length > 0) {
+                const formattedCount = String(validList.length).padStart(2, '0');
+                let htmlOutput = `
+                    <div style="margin-bottom: 10px; font-weight: bold; color: var(--success-color); font-size: 13px;">
+                        <i class="fa-solid fa-circle-check"></i> DANH SÁCH HỢP LỆ - ${formattedCount} VÕ SINH
+                    </div>
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table id="validStudentsTable">
+                            <thead>
+                                <tr>
+                                    <th class="stt-col">STT</th>
+                                    <th>MÃ VTF</th>
+                                    <th>HỌ VÀ TÊN</th>
+                                    <th>GIỚI TÍNH</th>
+                                    <th>NGÀY SINH</th>
+                                    <th>CẤP HIỆN TẠI</th>
+                                    <th>CẤP DỰ THI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                validList.forEach((item, index) => {
+                    htmlOutput += `
+                        <tr class="valid-student-row" data-id="${item.id}">
+                            <td class="stt-col">${index + 1}</td>
+                            <td class="vtf-id-text">${item.id}</td>
+                            <td><strong>${item.name}</strong></td>
+                            <td>${item.gender}</td>
+                            <td>${item.dob}</td>
+                            <td><span class="badge-cap">${item.currentCap}</span></td>
+                            <td>
+                                <select class="form-select valid-target-cap" style="padding: 4px 8px; font-size: 13px;">
+                                    ${generateCapOptions(item.targetCap)}
+                                </select>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                htmlOutput += `</tbody></table></div>`;
+                container.innerHTML = htmlOutput;
+            } else {
+                container.innerHTML = `<div class="empty-placeholder" style="color: var(--danger-color);">Không có mã VTF ID nào hợp lệ để hiển thị.</div>`;
+            }
+
+            /* ============================================
+                Bật Modal nếu phát hiện có mã không hợp lệ
+               ============================================ */
+            if (invalidList.length > 0) {
+                openInvalidModal(invalidList);
+            }
+
+        } catch (error) {
+            console.error(error);
+            container.innerHTML = `<div style="font-size: 13px; color: var(--danger-color); padding: 10px;"><i class="fa-solid fa-circle-xmark"></i> Lỗi: ${error.message}</div>`;
+        } finally {
+            btnVerify.disabled = false;
+            btnVerify.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Kiểm tra mã & cấp dự thi';
+        }
+    }
+
+    /* ===============================================
+        Hiển thị Modal Cảnh báo mã sai / không hợp lệ
+       =============================================== */
+    function openInvalidModal(invalidList) {
+        const modalBody = document.getElementById('invalidModalBody');
+        let html = `
+            <p style="margin-bottom: 12px; font-size: 14px; color: #555;">
+                Phát hiện <strong>${invalidList.length}</strong> mã không hợp lệ hoặc không đủ điều kiện đăng ký thi:
+            </p>
+            <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="stt-col">STT</th>
+                            <th>MÃ VTF</th>
+                            <th>LÝ DO KHÔNG HỢP LỆ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        invalidList.forEach((item, index) => {
+            html += `
+                <tr>
+                    <td class="stt-col">${index + 1}</td>
+                    <td><strong style="color: var(--danger-color);">${item.id}</strong></td>
+                    <td style="color: #842029;">${item.reason}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+            <p style="margin-top: 12px; font-size: 12px; color: #666; font-style: italic;">
+                * Lưu ý: Các mã không hợp lệ trên sẽ bị bỏ qua khi bạn gửi đăng ký.
+            </p>
+        `;
+
+        modalBody.innerHTML = html;
+        document.getElementById('invalidModal').classList.add('active');
+    }
+
+    // Đóng Modal Cảnh báo
+    function closeInvalidModal() {
+        document.getElementById('invalidModal').classList.remove('active');
+    }
+
+    // 3. XỬ LÝ GỬI FORM ĐĂNG KÝ VỀ GOOGLE SHEETS
+    async function handleSubmit() {
+        const diemTap = document.getElementById('diemTapSelect').value;
+        const btnSubmit = document.getElementById('btnSubmit');
+
+        if (!diemTap) {
+            alert('Vui lòng chọn Điểm tập ở Mục 1!');
+            document.getElementById('diemTapSelect').focus();
+            return;
+        }
+
+        // 1. Thu thập dữ liệu Võ sinh mới (Nếu chọn "Có")
+        const hasNewStudentsChoice = document.querySelector('input[name="hasNewStudents"]:checked').value;
+        const newStudentsPayload = [];
+
+        if (hasNewStudentsChoice === 'yes') {
+            const rows = document.querySelectorAll('#newStudentsTbody tr');
+            let hasError = false;
+
+            rows.forEach((row, idx) => {
+                const name = row.querySelector('.input-name').value.trim();
+                const dob = row.querySelector('.input-dob').value.trim();
+                const gender = row.querySelector('.input-gender').value;
+                const cccd = row.querySelector('.input-cccd').value.trim();
+                const address = row.querySelector('.input-address').value.trim();
+                const culture = row.querySelector('.input-culture').value;
+
+                if (!name && !dob && !gender && !cccd && !address && !culture) return;
+
+                if (!name || !dob || !gender) {
+                    alert(`Vui lòng điền đầy đủ Họ tên, Ngày sinh, Giới tính ở dòng số ${idx + 1} (Mục võ sinh mới)!`);
+                    hasError = true;
+                    return;
+                }
+
+                newStudentsPayload.push({ name, dob, gender, cccd, address, culture });
+            });
+
+            if (hasError) return;
+        }
+
+        // 2. Thu thập dữ liệu Võ sinh có mã đã được xác thực thành công ở Mục 3
+        const verifiedStudentsPayload = [];
+        const validRows = document.querySelectorAll('#validStudentsTable tbody tr.valid-student-row');
+        
+        validRows.forEach(row => {
+            const id = row.getAttribute('data-id');
+            const cells = row.querySelectorAll('td');
+            const name = cells[2].textContent.trim();
+            const gender = cells[3].textContent.trim();
+            const dob = cells[4].textContent.trim();
+            const currentCap = cells[5].textContent.trim();
+            const targetCap = row.querySelector('.valid-target-cap').value;
+
+            verifiedStudentsPayload.push({
+                id: id,
+                name: name,
+                gender: gender,
+                dob: dob,
+                currentCap: currentCap,
+                targetCap: targetCap
+            });
+        });
+
+        // Kiểm tra xem có dữ liệu gửi đi không
+        if (newStudentsPayload.length === 0 && verifiedStudentsPayload.length === 0) {
+            alert('Bạn chưa nhập danh sách Võ sinh mới hoặc chưa Xác thực mã Võ sinh cũ nào hợp lệ!');
+            return;
+        }
+
+        if (!confirm(`Xác nhận gửi đăng ký cho điểm tập [${diemTap}]?\n- Võ sinh mới: ${newStudentsPayload.length} người\n- Võ sinh có mã: ${verifiedStudentsPayload.length} người`)) {
+            return;
+        }
+
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi dữ liệu...';
+
+        const postPayload = {
+            diemTap: diemTap,
+            newStudents: newStudentsPayload,
+            existingStudents: verifiedStudentsPayload
+        };
+
+        try {
+            const response = await fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(postPayload)
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                alert('🎉 GỬI ĐĂNG KÝ THÀNH CÔNG!');
+                window.location.reload();
+            } else {
+                alert('Lỗi từ hệ thống: ' + (result.message || 'Không thể lưu dữ liệu'));
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert('Lỗi kết nối khi gửi đăng ký: ' + error.message);
+        } finally {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Gửi Đăng Ký';
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng Hợp Danh Sách Đăng Ký</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #1e3c72;
+            --primary-light: #2a5298;
+            --accent-color: #0d6efd;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --bg-body: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-color);
+            padding: 10px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Stat Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 5px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .stat-card.success { border-left-color: var(--success-color); }
+        .stat-card.warning { border-left-color: var(--warning-color); }
+
+        .stat-info h3 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-info p {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            font-size: 28px;
+            color: #94a3b8;
+        }
+
+        /* Action Bar */
+        .action-card {
+            background: var(--card-bg);
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+
+        /* Section & Tables */
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 9px 12px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+
+        tr:nth-child(even) { background-color: #f8fafc; }
+        tr:hover { background-color: #f1f5f9; }
+
+        .stt-col {
+            text-align: center;
+            font-weight: bold;
+            width: 50px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-location { background-color: #e0f2fe; color: #0369a1; }
+        .badge-cap { background-color: #dbeafe; color: #1e40af; }
+        .vtf-code { color: #0d6efd; font-weight: 700; }
+
+        .loading-box {
+            text-align: center;
+            padding: 30px;
+            font-size: 15px;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .empty-row {
+            text-align: center;
+            color: #64748b;
+            font-style: italic;
+            padding: 20px !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1><i class="fa-solid fa-list-check"></i> DANH SÁCH ĐĂNG KÝ</h1>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-info">
+		<p>TỔNG THÍ SINH</p>
+                <h3 id="statTotal">0</h3>
+            </div>
+            <i class="fa-solid fa-users stat-icon"></i>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-info">
+                <p>CẤP MÃ MỚI</p>
+                <h3 id="statNew">0</h3>
+            </div>
+            <i class="fa-solid fa-user-plus stat-icon"></i>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-info">
+                <p>ĐÃ CÓ MÃ VTF</p>
+                <h3 id="statExisting">0</h3>
+            </div>
+            <i class="fa-solid fa-id-card stat-icon"></i>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-card">
+        <button type="button" class="btn btn-primary" onclick="loadData()">
+            <i class="fa-solid fa-rotate"></i> Làm mới dữ liệu
+        </button>
+    </div>
+
+    <!-- Trạng thái tải dữ liệu -->
+    <div id="loadingStatus" class="loading-box" style="display: none;">
+        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+        <div style="margin-top: 10px;">Đang tải dữ liệu...</div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div id="contentContainer">
+        <!-- 1. BẢNG VÕ SINH MỚI -->
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fa-solid fa-user-plus" style="color: var(--success-color);"></i>
+                <span>1. Võ sinh cấp mã mới (<span id="countVoSinhMoi">0</span>)</span>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="stt-col">STT</th>
+                            <th>Điểm tập</th>
+                            <th>Họ và tên</th>
+                            <th>Ngày sinh</th>
+                            <th>Giới tính</th>
+                            <th>CCCD</th>
+                            <th>Địa chỉ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-vosinh-moi">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. BẢNG VÕ SINH ĐÃ CÓ MÃ -->
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fa-solid fa-id-badge" style="color: var(--accent-color);"></i>
+                <span>2. Võ sinh đã có mã VTF (<span id="countVoSinhCoMa">0</span>)</span>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="stt-col">STT</th>
+                            <th>Điểm tập</th>
+                            <th>Mã VTF</th>
+                            <th>Họ và tên</th>
+                            <th>Giới tính</th>
+                            <th>Ngày sinh</th>
+                            <th>Cấp dự thi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-vosinh-coma">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgFdtQfR6piBF8j1Yk7GkJni3GAwG9p9AX88fCzsnNyR1NEB5QzQM46HWSGxnp2rVY/exec";
+
+    let rawVoSinhMoi = [];
+    let rawVoSinhCoMa = [];
+
+    // Hàm định dạng ngày sinh dd/mm/yyyy
+    function formatDate(dateStr) {
+        if (!dateStr) return '---';
+        const str = String(dateStr).trim();
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) return str;
+
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        return str;
+    }
+
+    // Tải dữ liệu trực tiếp từ Google Apps Script
+    async function loadData() {
+        const loadingBox = document.getElementById('loadingStatus');
+        const contentContainer = document.getElementById('contentContainer');
+
+        loadingBox.style.display = 'block';
+        contentContainer.style.opacity = '0.4';
+
+        try {
+            const response = await fetch(SCRIPT_URL);
+            if (!response.ok) throw new Error("Không thể kết nối với server!");
+
+            const data = await response.json();
+
+            rawVoSinhMoi = data.voSinhMoi || [];
+            rawVoSinhCoMa = data.voSinhCoMa || [];
+
+            // Hiển thị trực tiếp toàn bộ dữ liệu
+            renderTableMoi(rawVoSinhMoi);
+            renderTableCoMa(rawVoSinhCoMa);
+
+            // Cập nhật thống kê
+            document.getElementById('statNew').innerText = rawVoSinhMoi.length;
+            document.getElementById('statExisting').innerText = rawVoSinhCoMa.length;
+            document.getElementById('statTotal').innerText = rawVoSinhMoi.length + rawVoSinhCoMa.length;
+
+            document.getElementById('countVoSinhMoi').innerText = rawVoSinhMoi.length;
+            document.getElementById('countVoSinhCoMa').innerText = rawVoSinhCoMa.length;
+
+        } catch (error) {
+            console.error('Lỗi tải dữ liệu:', error);
+            alert('Lỗi tải dữ liệu: ' + error.message);
+        } finally {
+            loadingBox.style.display = 'none';
+            contentContainer.style.opacity = '1';
+        }
+    }
+
+    // Render bảng Võ sinh mới (Địa chỉ ở row[6])
+    function renderTableMoi(dataList) {
+        const tbMoi = document.getElementById('tb-vosinh-moi');
+        tbMoi.innerHTML = '';
+
+        if (dataList.length === 0) {
+            tbMoi.innerHTML = '<tr><td colspan="7" class="empty-row">Không có dữ liệu võ sinh mới</td></tr>';
+            return;
+        }
+
+        dataList.forEach((row, index) => {
+            const diaChi = (row[6] !== undefined && String(row[6]).trim() !== '') ? row[6] : '---';
+
+            tbMoi.innerHTML += `
+                <tr>
+                    <td class="stt-col">${index + 1}</td>
+                    <td><span class="badge badge-location">${row[1] || '---'}</span></td>
+                    <td><strong>${row[2] || '---'}</strong></td>
+                    <td>${formatDate(row[3])}</td>
+                    <td>${row[4] || '---'}</td>
+                    <td>${row[5] || '---'}</td>
+                    <td>${diaChi}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // Render bảng Võ sinh đã có mã (Cấp dự thi ở row[7] hoặc row[6])
+    function renderTableCoMa(dataList) {
+        const tbCoMa = document.getElementById('tb-vosinh-coma');
+        tbCoMa.innerHTML = '';
+
+        if (dataList.length === 0) {
+            tbCoMa.innerHTML = '<tr><td colspan="7" class="empty-row">Không có dữ liệu võ sinh đã có mã VTF</td></tr>';
+            return;
+        }
+
+        dataList.forEach((row, index) => {
+            let capDuThi = '---';
+            if (row[7] !== undefined && String(row[7]).trim() !== '') {
+                capDuThi = row[7];
+            } else if (row[6] !== undefined && String(row[6]).trim() !== '') {
+                capDuThi = row[6];
+            }
+
+            tbCoMa.innerHTML += `
+                <tr>
+                    <td class="stt-col">${index + 1}</td>
+                    <td><span class="badge badge-location">${row[1] || '---'}</span></td>
+                    <td class="vtf-code">${row[2] || '---'}</td>
+                    <td><strong>${row[3] || '---'}</strong></td>
+                    <td>${row[4] || '---'}</td>
+                    <td>${formatDate(row[5])}</td>
+                    <td><span class="badge badge-cap">${capDuThi}</span></td>
+                </tr>
+            `;
+        });
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>
