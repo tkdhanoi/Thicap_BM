@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Thi - CLB Bạch Mai</title>
+    <title>Quản lý Thi Cấp - CLB Bạch Mai</title>
     
     <!-- Font Awesome cho icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -305,7 +305,7 @@
         // --- HÀM RESET DỮ LIỆU KỲ THI MỚI ---
         async function resetDataForNewExam() {
             // 1. Mật khẩu quản trị
-            const adminPassword = prompt("MẬT KHẨU QUẢN TRỊ VIÊN");
+            const adminPassword = prompt("MẬT KHẨU QUẢN TRỊ VIÊN:\nNhập mật khẩu xác nhận XÓA:");
             
             // Nếu người dùng nhấn Cancel (Hủy)
             if (adminPassword === null) return;
@@ -314,7 +314,7 @@
             const hashedInput = await sha256(adminPassword);
             
             // Chuỗi mã hóa SHA-256
-            const CORRECT_PASSWORD_HASH = "21cb170dd2b6833bc4edfaeddd223dcbfdf62883f3e1b7fbe9bc969e6b52a5ca";
+            const CORRECT_PASSWORD_HASH = "661c1952460bd92c5199ef7550eb716520f000481dd283f6f9e3629d4804fa79";
 
             // So sánh chuỗi đã mã hóa
             if (hashedInput !== CORRECT_PASSWORD_HASH) {
