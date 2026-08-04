@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tổng Hợp Danh Sách Đăng Ký (Realtime & Auto Sync)</title>
+    <title>Danh Sách (Realtime & Auto Sync)</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -369,10 +369,10 @@
         <!-- NÚT ĐỔI TAB (TABS NAVIGATION) -->
         <div class="tabs-nav">
             <button class="tab-btn active" onclick="switchTab('paneMoi', this)">
-                <i class="fa-solid fa-user-plus"></i> 1. Võ sinh cấp mã mới (<span id="countMoi">0</span>)
+                <i class="fa-solid fa-user-plus"></i> 1. Cấp mã mới (<span id="countMoi">0</span>)
             </button>
             <button class="tab-btn" onclick="switchTab('paneCoMa', this)">
-                <i class="fa-solid fa-id-badge"></i> 2. Võ sinh đã có mã VTF (<span id="countVTF">0</span>)
+                <i class="fa-solid fa-id-badge"></i> 2. Đã có mã VTF (<span id="countVTF">0</span>)
             </button>
         </div>
 
@@ -382,7 +382,7 @@
                 <div class="section-title">
                     <div class="section-title-left">
                         <i class="fa-solid fa-user-plus" style="color: var(--success-color);"></i>
-                        <span>Danh sách cấp mã mới</span>
+                        <span>Danh sách cấp mã</span>
                     </div>
                     <button class="btn-download" onclick="downloadVoSinhMoi()">
                         <i class="fa-solid fa-file-excel"></i> Tải về Excel
