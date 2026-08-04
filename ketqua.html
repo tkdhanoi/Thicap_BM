@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả Thi Cấp - CLB Taekwondo</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #1e3c72;
+            --primary-light: #2a5298;
+            --accent-color: #0d6efd;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --bg-body: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-color);
+            padding: 10px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        /* Header Cố Định */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: #fff;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Stat Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 10px 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .stat-card.success { border-left-color: var(--success-color); }
+        .stat-card.danger { border-left-color: var(--danger-color); }
+        .stat-card.warning { border-left-color: var(--warning-color); }
+
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-info p {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            color: #94a3b8;
+        }
+
+        /* Action & Filter Bar */
+        .action-card {
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            flex: 1;
+        }
+
+        .filter-group input, .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .filter-group input:focus, .filter-group select:focus {
+            border-color: var(--accent-color);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+
+        /* Section & Tables */
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 12px;
+        }
+
+        /* Table Responsive & Sticky TH Header */
+        .table-responsive {
+            width: 100%;
+            overflow: auto;
+            max-height: 450px; /* Chiều cao tối đa tự cuộn dữ liệu */
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            text-align: left;
+            white-space: nowrap;
+            /* Cố định tiêu đề bảng */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 9px 12px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+
+        tr:nth-child(even) { background-color: #f8fafc; }
+        tr:hover { background-color: #f1f5f9; }
+
+        .stt-col {
+            text-align: center;
+            font-weight: bold;
+            width: 50px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-location { background-color: #e0f2fe; color: #0369a1; }
+        .badge-cap { background-color: #f1f5f9; color: #334155; }
+        
+        /* Trạng thái kết quả */
+        .badge-dat { background-color: #d1e7dd; color: #0f5132; }
+        .badge-khongdat { background-color: #f8d7da; color: #842029; }
+        .badge-vangmat { background-color: #fff3cd; color: #664d03; }
+
+        .vtf-code { color: #0d6efd; font-weight: 700; }
+
+        .loading-box {
+            text-align: center;
+            padding: 30px;
+            font-size: 15px;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .empty-row {
+            text-align: center;
+            color: #64748b;
+            font-style: italic;
+            padding: 20px !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1><i class="fa-solid fa-award"></i> KẾT QUẢ THI CẤP</h1>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-info">
+                <p>Tổng thí sinh</p>
+                <h3 id="statTotal">0</h3>
+            </div>
+            <i class="fa-solid fa-users stat-icon"></i>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-info">
+                <p>Thi đạt</p>
+                <h3 id="statDat">0</h3>
+            </div>
+            <i class="fa-solid fa-circle-check stat-icon" style="color: var(--success-color);"></i>
+        </div>
+        <div class="stat-card danger">
+            <div class="stat-info">
+                <p>Không đạt</p>
+                <h3 id="statKhongDat">0</h3>
+            </div>
+            <i class="fa-solid fa-circle-xmark stat-icon" style="color: var(--danger-color);"></i>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-info">
+                <p>Vắng mặt</p>
+                <h3 id="statVangMat">0</h3>
+            </div>
+            <i class="fa-solid fa-circle-exclamation stat-icon" style="color: var(--warning-color);"></i>
+        </div>
+    </div>
+
+    <!-- Action & Filter Bar -->
+    <div class="action-card">
+        <div class="filter-group">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên hoặc mã VTF..." oninput="filterData()" style="min-width: 260px;">
+            <select id="diemTapFilter" onchange="filterData()">
+                <option value="">-- Tất cả điểm tập --</option>
+            </select>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="loadData()">
+            <i class="fa-solid fa-rotate"></i> Làm mới
+        </button>
+    </div>
+
+    <!-- Trạng thái tải dữ liệu -->
+    <div id="loadingStatus" class="loading-box" style="display: none;">
+        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+        <div style="margin-top: 10px;">Đang tải dữ liệu kết quả từ sheet KQThi...</div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="section-card" id="contentContainer">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="stt-col">STT</th>
+                        <th>Điểm tập</th>
+                        <th>Mã VTF</th>
+                        <th>Họ và tên</th>
+                        <th>Giới tính</th>
+                        <th>Ngày sinh</th>
+                        <th>Cấp thi</th>
+                        <th>Kết quả</th>
+                    </tr>
+                </thead>
+                <tbody id="tb-ketqua">
+                    <!-- Dynamic content -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgFdtQfR6piBF8j1Yk7GkJni3GAwG9p9AX88fCzsnNyR1NEB5QzQM46HWSGxnp2rVY/exec";
+
+    let allStudents = [];
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '---';
+        const str = String(dateStr).trim();
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) return str;
+
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        return str;
+    }
+
+    async function loadData() {
+        const loadingBox = document.getElementById('loadingStatus');
+        const contentContainer = document.getElementById('contentContainer');
+
+        loadingBox.style.display = 'block';
+        contentContainer.style.opacity = '0.4';
+
+        try {
+            const response = await fetch(SCRIPT_URL);
+            if (!response.ok) throw new Error("Không thể kết nối với server!");
+
+            const data = await response.json();
+
+            let rawKQThi = data.kqThi || data.KQThi || [];
+
+            allStudents = [];
+
+            rawKQThi.forEach(row => {
+                allStudents.push({
+                    diemTap: row[1] || '---',
+                    maVtf: row[2] || '---',
+                    hoTen: row[3] || '---',
+                    gioiTinh: row[4] || '---',
+                    ngaySinh: formatDate(row[5]),
+                    capThi: row[6] || '---',
+                    ketQua: row[7] || 'Đạt'
+                });
+            });
+
+            populateDiemTapDropdown(allStudents);
+            renderTable(allStudents);
+            updateStats(allStudents);
+
+        } catch (error) {
+            console.error('Lỗi tải dữ liệu:', error);
+            alert('Lỗi tải dữ liệu kết quả: ' + error.message);
+        } finally {
+            loadingBox.style.display = 'none';
+            contentContainer.style.opacity = '1';
+        }
+    }
+
+    function populateDiemTapDropdown(dataList) {
+        const select = document.getElementById('diemTapFilter');
+        const currentVal = select.value;
+        
+        const diemTaps = [...new Set(dataList.map(item => item.diemTap))].filter(val => val && val !== '---');
+        diemTaps.sort();
+
+        select.innerHTML = '<option value="">-- Tất cả điểm tập --</option>';
+        diemTaps.forEach(dt => {
+            select.innerHTML += `<option value="${dt}">${dt}</option>`;
+        });
+
+        select.value = currentVal;
+    }
+
+    function filterData() {
+        const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+        const diemTapVal = document.getElementById('diemTapFilter').value;
+
+        const filtered = allStudents.filter(item => {
+            const matchKey = item.hoTen.toLowerCase().includes(keyword) || item.maVtf.toLowerCase().includes(keyword);
+            const matchDiemTap = diemTapVal === "" || item.diemTap === diemTapVal;
+            return matchKey && matchDiemTap;
+        });
+
+        renderTable(filtered);
+    }
+
+    function updateStats(dataList) {
+        let total = dataList.length;
+        let dat = dataList.filter(i => i.ketQua.toLowerCase().includes('đạt') && !i.ketQua.toLowerCase().includes('không')).length;
+        let khongDat = dataList.filter(i => i.ketQua.toLowerCase().includes('không đạt')).length;
+        let vangMat = dataList.filter(i => i.ketQua.toLowerCase().includes('vắng')).length;
+
+        document.getElementById('statTotal').innerText = total;
+        document.getElementById('statDat').innerText = dat;
+        document.getElementById('statKhongDat').innerText = khongDat;
+        document.getElementById('statVangMat').innerText = vangMat;
+    }
+
+    function renderTable(dataList) {
+        const tbody = document.getElementById('tb-ketqua');
+        tbody.innerHTML = '';
+
+        if (dataList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-row">Không tìm thấy dữ liệu kết quả phù hợp</td></tr>';
+            return;
+        }
+
+        dataList.forEach((item, index) => {
+            let badgeClass = 'badge-dat';
+            let kqText = item.ketQua;
+            
+            if (kqText.toLowerCase().includes('không đạt')) {
+                badgeClass = 'badge-khongdat';
+            } else if (kqText.toLowerCase().includes('vắng')) {
+                badgeClass = 'badge-vangmat';
+            }
+
+            tbody.innerHTML += `
+                <tr>
+                    <td class="stt-col">${index + 1}</td>
+                    <td><span class="badge badge-location">${item.diemTap}</span></td>
+                    <td class="vtf-code">${item.maVtf}</td>
+                    <td><strong>${item.hoTen}</strong></td>
+                    <td>${item.gioiTinh}</td>
+                    <td>${item.ngaySinh}</td>
+                    <td><span class="badge badge-cap">${item.capThi}</span></td>
+                    <td><span class="badge ${badgeClass}">${kqText}</span></td>
+                </tr>
+            `;
+        });
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>
