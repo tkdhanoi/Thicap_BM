@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Thi Cấp - CLB Bạch Mai</title>
+    <title>Quản lý Thi - CLB Bạch Mai</title>
+    
+    <!-- Font Awesome cho icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDK (v9 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -32,16 +40,14 @@
         .container {
             text-align: center;
             background: rgba(255, 255, 255, 0.92);
-            /* Giảm padding hai bên để tăng không gian cho nội dung trên điện thoại */
             padding: 25px 20px; 
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             max-width: 500px;
-            width: 100%; /* Đảm bảo căn lề đẹp trên thiết bị nhỏ */
+            width: 100%;
             backdrop-filter: blur(5px);
         }
 
-        /* Tùy chỉnh hiển thị Logo phía trên */
         .logo-img {
             width: 90px;
             height: 90px;
@@ -52,17 +58,15 @@
             border: 3px solid #fff;
         }
 
-        /* H1 auto co giãn font chữ và KHÔNG xuống hàng */
         h1 {
             margin-bottom: 8px;
             color: #d9534f;
-            font-size: clamp(20px, 4.5vw, 24px); /* Tự co giãn theo màn hình */
+            font-size: clamp(22px, 4.5vw, 24px);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            white-space: nowrap; /* Tuyệt đối không xuống hàng */
+            white-space: nowrap;
         }
 
-        /* H2 auto co giãn tương tự */
         h2 {
             margin-bottom: 25px;
             color: #2c3e50;
@@ -71,29 +75,32 @@
             white-space: nowrap;
         }
 
-        /* Menu nút tự căn chỉnh 1 hàng */
         .tab-menu {
             display: flex;
             justify-content: center;
-            gap: 8px; /* Giảm khoảng cách giữa các nút */
-            flex-wrap: nowrap; /* Bắt buộc nằm trên 1 hàng */
+            gap: 8px;
+            flex-wrap: nowrap;
             width: 100%;
+            margin-bottom: 15px;
         }
 
-        /* Cấu hình các nút tự chia đều chiều rộng và tự chỉnh cỡ chữ */
         .tab-btn {
-            flex: 1; /* Tự co giãn đều chiều rộng */
+            flex: 1;
             text-decoration: none;
-            padding: 12px 6px; /* Padding linh hoạt */
-            font-size: clamp(13px, 2.8vw, 15px); /* Chữ tự nhỏ lại trên mobile */
+            padding: 12px 6px;
+            font-size: clamp(14px, 2.8vw, 15px);
             font-weight: 600;
             border-radius: 8px;
             border: none;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            white-space: nowrap; /* Giữ chữ trên nút không bị gãy dòng */
+            white-space: nowrap;
             text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         .tab-btn:hover {
@@ -101,46 +108,50 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.1);
         }
 
-        /* Nút Tab Đăng Ký */
-        .tab-btn.register {
-            background-color: #3498db;
+        .tab-btn.register { background-color: #3498db; color: white; }
+        .tab-btn.register:hover { background-color: #2980b9; }
+
+        .tab-btn.list { background-color: #2ecc71; color: white; }
+        .tab-btn.list:hover { background-color: #27ae60; }
+
+        .tab-btn.result { background-color: #e67e22; color: white; }
+        .tab-btn.result:hover { background-color: #d35400; }
+
+        /* Nút Reset Quản Trị Hệ Thống */
+        .admin-section {
+            border-top: 1px dashed #ccc;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .btn-reset-exam {
+            background-color: #dc3545;
             color: white;
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .tab-btn.register:hover {
-            background-color: #2980b9;
+        .btn-reset-exam:hover {
+            background-color: #bb2d3b;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
         }
 
-        /* Nút Tab Danh Sách */
-        .tab-btn.list {
-            background-color: #2ecc71;
-            color: white;
-        }
-
-        .tab-btn.list:hover {
-            background-color: #27ae60;
-        }
-
-        /* Nút Tab Kết Quả */
-        .tab-btn.result {
-            background-color: #e67e22;
-            color: white;
-        }
-
-        .tab-btn.result:hover {
-            background-color: #d35400;
-        }
-
-        /* ==========================================
-           STYLE CHO CỬA SỔ NỔI (MODAL POPUP)
-           ========================================== */
+        /* POPUP MODAL */
         .modal {
-            display: none; /* Ẩn mặc định */
+            display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             background-color: rgba(0, 0, 0, 0.65);
             backdrop-filter: blur(4px);
             z-index: 1000;
@@ -149,14 +160,11 @@
             animation: fadeIn 0.25s ease-out;
         }
 
-        .modal.active {
-            display: flex; /* Hiển thị khi được gọi */
-        }
+        .modal.active { display: flex; }
 
         .modal-content {
             background: #fff;
-            width: 100%;
-            height: 98vh;
+            width: 100%; height: 98vh;
             max-width: 1260px;
             border-radius: 12px;
             position: relative;
@@ -167,18 +175,15 @@
             animation: scaleUp 0.25s ease-out;
         }
 
-        /* Nút đóng Popup */
         .close-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 20px;
-            height: 20px;
+            top: 10px; right: 10px;
+            width: 25px; height: 25px;
             background: #e74c3c;
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -194,24 +199,14 @@
             transform: scale(1.1);
         }
 
-        /* Khung hiển thị nội dung trang con */
         .modal-iframe {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             border: none;
             border-radius: 12px;
         }
 
-        /* Hiệu ứng hiển thị mượt mà */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes scaleUp {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -224,10 +219,22 @@
         <h2>Hệ Thống Quản Lý Thi Cấp</h2>
         
         <div class="tab-menu">
-            <!-- Thay đổi thẻ <a> sang nút gọi hàm mở Modal -->
-            <button type="button" onclick="openModal('dangky.html')" class="tab-btn register">Đăng Ký</button>
-            <button type="button" onclick="openModal('danhsach.html')" class="tab-btn list">Xem Danh Sách</button>
-            <button type="button" onclick="openModal('ketqua.html')" class="tab-btn result">Kết Quả</button>
+            <button type="button" onclick="openModal('dangky.html')" class="tab-btn register">
+                <i class="fa-solid fa-pen-to-square"></i> Đăng Ký
+            </button>
+            <button type="button" onclick="openModal('danhsach.html')" class="tab-btn list">
+                <i class="fa-solid fa-list-check"></i> Xem Danh Sách
+            </button>
+            <button type="button" onclick="openModal('ketqua.html')" class="tab-btn result">
+                <i class="fa-solid fa-award"></i> Kết Quả
+            </button>
+        </div>
+
+        <!-- Khu vực Quản trị - Nút Reset Kỳ thi -->
+        <div class="admin-section">
+            <button type="button" class="btn-reset-exam" onclick="resetDataForNewExam()">
+                <i class="fa-solid fa-rotate-right"></i> Reset Dữ Liệu Cho Kỳ Thi Mới
+            </button>
         </div>
     </div>
 
@@ -240,6 +247,22 @@
     </div>
 
     <script>
+        // --- CẤU HÌNH KẾT NỐI FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDD2-w8VKQqHAVM_yrgzGQgVcJ0yDw8JhE",
+            authDomain: "thicapbm-8f9fe.firebaseapp.com",
+            databaseURL: "https://thicapbm-8f9fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "thicapbm-8f9fe",
+            storageBucket: "thicapbm-8f9fe.firebasestorage.app",
+            messagingSenderId: "1071870945646",
+            appId: "1:1071870945646:web:3aab38930c2f08b7d7f97f",
+            measurementId: "G-SVETDQBGFR"
+        };
+
+        // Khởi tạo Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         // Mở Cửa sổ nổi
         function openModal(url) {
             const modal = document.getElementById('popupModal');
@@ -264,12 +287,77 @@
             }
         };
 
-        // Đóng khi người dùng bấm phím ESC trên bàn phím
+        // Đóng khi người dùng bấm phím ESC
         window.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeModal();
             }
         });
+
+        // --- HÀM MÃ HÓA MẬT KHẨU SANG SHA-256 ---
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // --- HÀM RESET DỮ LIỆU KỲ THI MỚI ---
+        async function resetDataForNewExam() {
+            // 1. Mật khẩu quản trị
+            const adminPassword = prompt("MẬT KHẨU QUẢN TRỊ VIÊN");
+            
+            // Nếu người dùng nhấn Cancel (Hủy)
+            if (adminPassword === null) return;
+
+            // Mã hóa chuỗi vừa nhập sang SHA-256
+            const hashedInput = await sha256(adminPassword);
+            
+            // Chuỗi mã hóa SHA-256
+            const CORRECT_PASSWORD_HASH = "21cb170dd2b6833bc4edfaeddd223dcbfdf62883f3e1b7fbe9bc969e6b52a5ca";
+
+            // So sánh chuỗi đã mã hóa
+            if (hashedInput !== CORRECT_PASSWORD_HASH) {
+                alert("Mật khẩu không đúng! Thao tác bị hủy.");
+                return;
+            }
+
+            // 2. Cảnh báo xác nhận
+            const confirmDelete = confirm(
+                "⚠️ CẢNH BÁO NGHIÊM TRỌNG:\n\n" +
+                "Bạn có chắc chắn muốn xóa dữ liệu?"
+            );
+
+            if (!confirmDelete) return;
+
+            try {
+                const now = new Date();
+                const examBatchKey = `Dot_Thi_${now.getFullYear()}_${(now.getMonth()+1).toString().padStart(2,'0')}_${now.getDate()}`;
+                
+                // Lấy dữ liệu hiện tại để sao lưu
+                const snapMoi = await database.ref('voSinhMoi').once('value');
+                const snapCoMa = await database.ref('voSinhCoMa').once('value');
+
+                // Tự động sao lưu vào nhánh 'lichSuDangKy'
+                if (snapMoi.exists() || snapCoMa.exists()) {
+                    await database.ref(`lichSuDangKy/${examBatchKey}`).set({
+                        voSinhMoi: snapMoi.val() || null,
+                        voSinhCoMa: snapCoMa.val() || null,
+                        archivedAt: now.toISOString()
+                    });
+                }
+
+                // 3. Xóa dữ liệu hiện tại trên Firebase
+                await database.ref('voSinhMoi').remove();
+                await database.ref('voSinhCoMa').remove();
+
+                alert("🎉 ĐÃ RESET THÀNH CÔNG!");
+
+            } catch (error) {
+                console.error("Lỗi xóa dữ liệu:", error);
+                alert("Có lỗi xảy ra trong quá trình xóa dữ liệu: " + error.message);
+            }
+        }
     </script>
 
 </body>
