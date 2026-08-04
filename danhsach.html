@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tổng Hợp Danh Sách Đăng Ký (Realtime)</title>
+    <title>Tổng Hợp Danh Sách Đăng Ký (Realtime & Auto Sync)</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -66,6 +66,14 @@
             letter-spacing: 0.5px;
         }
 
+        .status-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+
         .realtime-indicator {
             display: inline-flex;
             align-items: center;
@@ -75,7 +83,17 @@
             font-size: 12px;
             padding: 2px 10px;
             border-radius: 12px;
-            margin-top: 5px;
+        }
+
+        .gsheet-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #0f9d58;
+            color: white;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 12px;
         }
 
         .pulse-dot {
@@ -96,12 +114,12 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 15px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .stat-card {
             background: var(--card-bg);
-            padding: 5px 20px;
+            padding: 8px 20px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             display: flex;
@@ -130,10 +148,54 @@
             color: #94a3b8;
         }
 
+        /* --- PHẦN GIAO DIỆN NÚT TAB MỚI --- */
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .tab-btn {
+            background: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: #cbd5e1;
+            color: #1e293b;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+        /* --------------------------------- */
+
         .section-card {
             background: var(--card-bg);
             border-radius: 8px;
-            padding: 10px;
+            padding: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 10px;
         }
@@ -142,18 +204,50 @@
             font-size: 16px;
             font-weight: 700;
             color: var(--primary-color);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 10px;
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 10px;
         }
 
+        .section-title-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-download {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-download:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-download.accent {
+            background-color: var(--accent-color);
+        }
+
         .table-responsive {
             width: 100%;
             overflow: auto;
-            max-height: 450px;
+            max-height: 500px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
         }
@@ -231,9 +325,10 @@
 
 <div class="container">
     <div class="header">
-        <h1><i class="fa-solid fa-list-check"></i> DANH SÁCH ĐĂNG KÝ THI</h1>
-        <div>
-            <span class="realtime-indicator"><span class="pulse-dot"></span> ĐANG KẾT NỐI REALTIME</span>
+        <h1><i class="fa-solid fa-list-check"></i> DANH SÁCH ĐĂNG KÝ</h1>
+        <div class="status-container">
+            <span class="realtime-indicator"><span class="pulse-dot"></span> REALTIME FIREBASE</span>
+            <span class="gsheet-indicator" id="gsheetStatus"><i class="fa-solid fa-file-excel"></i> AUTO SYNC GOOGLE SHEETS</span>
         </div>
     </div>
 
@@ -255,7 +350,7 @@
         </div>
         <div class="stat-card warning">
             <div class="stat-info">
-                <p>ĐÃ CÓ MÃ VTF</p>
+                <p>ĐÃ CÓ MÃ</p>
                 <h3 id="statExisting">0</h3>
             </div>
             <i class="fa-solid fa-id-card stat-icon"></i>
@@ -270,76 +365,130 @@
 
     <!-- Main Content Container -->
     <div id="contentContainer" style="display: none;">
-        <!-- 1. BẢNG VÕ SINH MỚI -->
-        <div class="section-card">
-            <div class="section-title">
-                <i class="fa-solid fa-user-plus" style="color: var(--success-color);"></i>
-                <span>1. Võ sinh cấp mã mới (<span id="countVoSinhMoi">0</span>)</span>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="stt-col">STT</th>
-                            <th>Điểm tập</th>
-                            <th>Họ và tên</th>
-                            <th>Ngày sinh</th>
-                            <th>Giới tính</th>
-                            <th>CCCD</th>
-                            <th>Địa chỉ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-vosinh-moi">
-                        <!-- Dynamic content -->
-                    </tbody>
-                </table>
+        
+        <!-- NÚT ĐỔI TAB (TABS NAVIGATION) -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('paneMoi', this)">
+                <i class="fa-solid fa-user-plus"></i> 1. Võ sinh cấp mã mới (<span id="countMoi">0</span>)
+            </button>
+            <button class="tab-btn" onclick="switchTab('paneCoMa', this)">
+                <i class="fa-solid fa-id-badge"></i> 2. Võ sinh đã có mã VTF (<span id="countVTF">0</span>)
+            </button>
+        </div>
+
+        <!-- TAB 1: BẢNG VÕ SINH MỚI -->
+        <div id="paneMoi" class="tab-pane active">
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="section-title-left">
+                        <i class="fa-solid fa-user-plus" style="color: var(--success-color);"></i>
+                        <span>Danh sách cấp mã mới</span>
+                    </div>
+                    <button class="btn-download" onclick="downloadVoSinhMoi()">
+                        <i class="fa-solid fa-file-excel"></i> Tải về Excel
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="stt-col">STT</th>
+                                <th>Điểm tập</th>
+                                <th>Họ và tên</th>
+                                <th>Ngày sinh</th>
+                                <th>Giới tính</th>
+                                <th>CCCD</th>
+                                <th>Địa chỉ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-vosinh-moi">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- 2. BẢNG VÕ SINH ĐÃ CÓ MÃ -->
-        <div class="section-card">
-            <div class="section-title">
-                <i class="fa-solid fa-id-badge" style="color: var(--accent-color);"></i>
-                <span>2. Võ sinh đã có mã VTF (<span id="countVoSinhCoMa">0</span>)</span>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="stt-col">STT</th>
-                            <th>Điểm tập</th>
-                            <th>Mã VTF</th>
-                            <th>Họ và tên</th>
-                            <th>Giới tính</th>
-                            <th>Ngày sinh</th>
-                            <th>Cấp dự thi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-vosinh-coma">
-                        <!-- Dynamic content -->
-                    </tbody>
-                </table>
+        <!-- TAB 2: BẢNG VÕ SINH ĐÃ CÓ MÃ -->
+        <div id="paneCoMa" class="tab-pane">
+            <div class="section-card">
+                <div class="section-title">
+                    <div class="section-title-left">
+                        <i class="fa-solid fa-id-badge" style="color: var(--accent-color);"></i>
+                        <span>Danh sách đã có mã</span>
+                    </div>
+                    <button class="btn-download accent" onclick="downloadVoSinhCoMa()">
+                        <i class="fa-solid fa-file-excel"></i> Tải về Excel
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="stt-col">STT</th>
+                                <th>Điểm tập</th>
+                                <th>Mã VTF</th>
+                                <th>Họ và tên</th>
+                                <th>Giới tính</th>
+                                <th>Ngày sinh</th>
+                                <th>Cấp dự thi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-vosinh-coma">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
     </div>
 </div>
 
 <script>
-    // --- THAY THẾ BẰNG CẤU HÌNH FIREBASE CỦA BẠN TỪ BƯỚC 1 ---
+    // URL GOOGLE APPS SCRIPT
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgFdtQfR6piBF8j1Yk7GkJni3GAwG9p9AX88fCzsnNyR1NEB5QzQM46HWSGxnp2rVY/exec";
+
+    // Cấu hình Firebase Realtime Database
     const firebaseConfig = {
-  	apiKey: "AIzaSyDD2-w8VKQqHAVM_yrgzGQgVcJ0yDw8JhE",
-  	authDomain: "thicapbm-8f9fe.firebaseapp.com",
-  	databaseURL: "https://thicapbm-8f9fe-default-rtdb.asia-southeast1.firebasedatabase.app",
-  	projectId: "thicapbm-8f9fe",
-  	storageBucket: "thicapbm-8f9fe.firebasestorage.app",
-  	messagingSenderId: "1071870945646",
-  	appId: "1:1071870945646:web:3aab38930c2f08b7d7f97f",
-  	measurementId: "G-SVETDQBGFR"
-     };
+        apiKey: "AIzaSyDD2-w8VKQqHAVM_yrgzGQgVcJ0yDw8JhE",
+        authDomain: "thicapbm-8f9fe.firebaseapp.com",
+        databaseURL: "https://thicapbm-8f9fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "thicapbm-8f9fe",
+        storageBucket: "thicapbm-8f9fe.firebasestorage.app",
+        messagingSenderId: "1071870945646",
+        appId: "1:1071870945646:web:3aab38930c2f08b7d7f97f",
+        measurementId: "G-SVETDQBGFR"
+    };
 
     // Khởi tạo Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
+
+    // Biến lưu trữ dữ liệu toàn cục
+    let currentVoSinhMoi = [];
+    let currentVoSinhCoMa = [];
+    let previousDataLength = -1;
+
+    // Hàm chuyển Tab
+    function switchTab(tabId, btnElement) {
+        // Xóa class active ở tất cả các tab-btn
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // Thêm class active cho tab được click
+        btnElement.classList.add('active');
+
+        // Ẩn toàn bộ các tab-pane
+        const panes = document.querySelectorAll('.tab-pane');
+        panes.forEach(pane => pane.classList.remove('active'));
+
+        // Hiển thị tab-pane tương ứng
+        const targetPane = document.getElementById(tabId);
+        if (targetPane) {
+            targetPane.classList.add('active');
+        }
+    }
 
     function formatDate(dateStr) {
         if (!dateStr) return '---';
@@ -356,7 +505,7 @@
         return str;
     }
 
-    // Tự động lắng nghe cập nhật trực tiếp từ Firebase Realtime Database
+    // Lắng nghe cập nhật trực tiếp từ Firebase
     function startRealtimeListener() {
         const loadingBox = document.getElementById('loadingStatus');
         const contentContainer = document.getElementById('contentContainer');
@@ -370,23 +519,56 @@
             const voSinhMoiObj = data.voSinhMoi || {};
             const voSinhCoMaObj = data.voSinhCoMa || {};
 
-            // Chuyển Object Firebase thành Mảng dữ liệu
-            const rawVoSinhMoi = Object.values(voSinhMoiObj);
-            const rawVoSinhCoMa = Object.values(voSinhCoMaObj);
+            currentVoSinhMoi = Object.values(voSinhMoiObj);
+            currentVoSinhCoMa = Object.values(voSinhCoMaObj);
 
-            renderTableMoi(rawVoSinhMoi);
-            renderTableCoMa(rawVoSinhCoMa);
+            renderTableMoi(currentVoSinhMoi);
+            renderTableCoMa(currentVoSinhCoMa);
 
-            document.getElementById('statNew').innerText = rawVoSinhMoi.length;
-            document.getElementById('statExisting').innerText = rawVoSinhCoMa.length;
-            document.getElementById('statTotal').innerText = rawVoSinhMoi.length + rawVoSinhCoMa.length;
+            // Cập nhật số liệu trên thẻ thống kê & nút tab
+            document.getElementById('statNew').innerText = currentVoSinhMoi.length;
+            document.getElementById('statExisting').innerText = currentVoSinhCoMa.length;
+            document.getElementById('statTotal').innerText = currentVoSinhMoi.length + currentVoSinhCoMa.length;
 
-            document.getElementById('countVoSinhMoi').innerText = rawVoSinhMoi.length;
-            document.getElementById('countVoSinhCoMa').innerText = rawVoSinhCoMa.length;
+            document.getElementById('countMoi').innerText = currentVoSinhMoi.length;
+            document.getElementById('countVTF').innerText = currentVoSinhCoMa.length;
+
+            // Tự động đồng bộ với Google Sheets khi có dữ liệu mới
+            const totalCount = currentVoSinhMoi.length + currentVoSinhCoMa.length;
+            if (totalCount !== previousDataLength) {
+                previousDataLength = totalCount;
+                autoSyncToGoogleSheet(currentVoSinhMoi, currentVoSinhCoMa);
+            }
         }, (error) => {
             console.error('Lỗi khi lắng nghe dữ liệu Firebase:', error);
             alert('Lỗi kết nối Realtime: ' + error.message);
         });
+    }
+
+    // Hàm tự động gửi dữ liệu sang Google Sheets
+    async function autoSyncToGoogleSheet(voSinhMoi, voSinhCoMa) {
+        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("DÁN_WEB_APP_URL")) return;
+
+        const gsheetStatus = document.getElementById("gsheetStatus");
+        gsheetStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ĐANG ĐỒNG BỘ GOOGLE SHEETS...`;
+
+        const payload = {
+            voSinhMoi: voSinhMoi,
+            voSinhDaCoMa: voSinhCoMa
+        };
+
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            gsheetStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> ĐÃ ĐỒNG BỘ GOOGLE SHEETS`;
+        } catch (error) {
+            console.error("Lỗi tự động đồng bộ Google Sheets:", error);
+            gsheetStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> LỖI ĐỒNG BỘ SHEET`;
+        }
     }
 
     function renderTableMoi(dataList) {
@@ -435,6 +617,68 @@
                 </tr>
             `;
         });
+    }
+
+    // Tải file Excel
+    function downloadVoSinhMoi() {
+        if (currentVoSinhMoi.length === 0) {
+            alert("Chưa có dữ liệu Võ sinh cấp mã mới để tải về!");
+            return;
+        }
+
+        let csvContent = "\uFEFF";
+        csvContent += "STT,Điểm tập,Họ và tên,Ngày sinh,Giới tính,CCCD,Địa chỉ\n";
+
+        currentVoSinhMoi.forEach((item, index) => {
+            const row = [
+                index + 1,
+                `"${(item.diemTap || '---').replace(/"/g, '""')}"`,
+                `"${(item.name || '---').replace(/"/g, '""')}"`,
+                `"${formatDate(item.dob)}"`,
+                `"${(item.gender || '---').replace(/"/g, '""')}"`,
+                `"'${(item.cccd || '---').replace(/"/g, '""')}"`,
+                `"${(item.address || '---').replace(/"/g, '""')}"`
+            ];
+            csvContent += row.join(",") + "\n";
+        });
+
+        triggerDownload(csvContent, "VoSinh_CapMaMoi.csv");
+    }
+
+    function downloadVoSinhCoMa() {
+        if (currentVoSinhCoMa.length === 0) {
+            alert("Chưa có dữ liệu Võ sinh đã có mã VTF để tải về!");
+            return;
+        }
+
+        let csvContent = "\uFEFF";
+        csvContent += "STT,Điểm tập,Mã VTF,Họ và tên,Giới tính,Ngày sinh,Cấp dự thi\n";
+
+        currentVoSinhCoMa.forEach((item, index) => {
+            const row = [
+                index + 1,
+                `"${(item.diemTap || '---').replace(/"/g, '""')}"`,
+                `"'${(item.id || '---').replace(/"/g, '""')}"`,
+                `"${(item.name || '---').replace(/"/g, '""')}"`,
+                `"${(item.gender || '---').replace(/"/g, '""')}"`,
+                `"${formatDate(item.dob)}"`,
+                `"${(item.targetCap || '---').replace(/"/g, '""')}"`
+            ];
+            csvContent += row.join(",") + "\n";
+        });
+
+        triggerDownload(csvContent, "VoSinh_DaCoMaVTF.csv");
+    }
+
+    function triggerDownload(csvContent, fileName) {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     window.onload = startRealtimeListener;
