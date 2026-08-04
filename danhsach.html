@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tổng Hợp Danh Sách Đăng Ký</title>
+    <title>Tổng Hợp Danh Sách Đăng Ký (Realtime)</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDK (v9 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
         :root {
@@ -42,7 +46,6 @@
             margin: 0 auto;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
             color: #fff;
@@ -51,6 +54,9 @@
             text-align: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             margin-bottom: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header h1 {
@@ -59,8 +65,33 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
+        .realtime-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #10b981;
+            color: white;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-top: 5px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
         
-        /* Stat Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -99,41 +130,6 @@
             color: #94a3b8;
         }
 
-        /* Action Bar */
-        .action-card {
-            background: var(--card-bg);
-            padding: 5px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background-color: #0b5ed7;
-        }
-
-        /* Section & Tables */
         .section-card {
             background: var(--card-bg);
             border-radius: 8px;
@@ -156,7 +152,8 @@
 
         .table-responsive {
             width: 100%;
-            overflow-x: auto;
+            overflow: auto;
+            max-height: 450px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
         }
@@ -177,6 +174,9 @@
             border-right: 1px solid var(--border-color);
             text-align: left;
             white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         td {
@@ -230,16 +230,18 @@
 <body>
 
 <div class="container">
-    <!-- Header -->
     <div class="header">
-        <h1><i class="fa-solid fa-list-check"></i> DANH SÁCH ĐĂNG KÝ</h1>
+        <h1><i class="fa-solid fa-list-check"></i> DANH SÁCH ĐĂNG KÝ THI</h1>
+        <div>
+            <span class="realtime-indicator"><span class="pulse-dot"></span> ĐANG KẾT NỐI REALTIME</span>
+        </div>
     </div>
 
     <!-- Stats Section -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-info">
-		<p>TỔNG THÍ SINH</p>
+                <p>TỔNG THÍ SINH</p>
                 <h3 id="statTotal">0</h3>
             </div>
             <i class="fa-solid fa-users stat-icon"></i>
@@ -260,21 +262,14 @@
         </div>
     </div>
 
-    <!-- Action Bar -->
-    <div class="action-card">
-        <button type="button" class="btn btn-primary" onclick="loadData()">
-            <i class="fa-solid fa-rotate"></i> Làm mới dữ liệu
-        </button>
-    </div>
-
-    <!-- Trạng thái tải dữ liệu -->
-    <div id="loadingStatus" class="loading-box" style="display: none;">
+    <!-- Trạng thái kết nối -->
+    <div id="loadingStatus" class="loading-box">
         <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
-        <div style="margin-top: 10px;">Đang tải dữ liệu...</div>
+        <div style="margin-top: 10px;">Đang kết nối nhận dữ liệu trực tiếp...</div>
     </div>
 
     <!-- Main Content Container -->
-    <div id="contentContainer">
+    <div id="contentContainer" style="display: none;">
         <!-- 1. BẢNG VÕ SINH MỚI -->
         <div class="section-card">
             <div class="section-title">
@@ -330,12 +325,22 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgFdtQfR6piBF8j1Yk7GkJni3GAwG9p9AX88fCzsnNyR1NEB5QzQM46HWSGxnp2rVY/exec";
+    // --- THAY THẾ BẰNG CẤU HÌNH FIREBASE CỦA BẠN TỪ BƯỚC 1 ---
+    const firebaseConfig = {
+  	apiKey: "AIzaSyDD2-w8VKQqHAVM_yrgzGQgVcJ0yDw8JhE",
+  	authDomain: "thicapbm-8f9fe.firebaseapp.com",
+  	databaseURL: "https://thicapbm-8f9fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+  	projectId: "thicapbm-8f9fe",
+  	storageBucket: "thicapbm-8f9fe.firebasestorage.app",
+  	messagingSenderId: "1071870945646",
+  	appId: "1:1071870945646:web:3aab38930c2f08b7d7f97f",
+  	measurementId: "G-SVETDQBGFR"
+     };
 
-    let rawVoSinhMoi = [];
-    let rawVoSinhCoMa = [];
+    // Khởi tạo Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-    // Hàm định dạng ngày sinh dd/mm/yyyy
     function formatDate(dateStr) {
         if (!dateStr) return '---';
         const str = String(dateStr).trim();
@@ -351,45 +356,39 @@
         return str;
     }
 
-    // Tải dữ liệu trực tiếp từ Google Apps Script
-    async function loadData() {
+    // Tự động lắng nghe cập nhật trực tiếp từ Firebase Realtime Database
+    function startRealtimeListener() {
         const loadingBox = document.getElementById('loadingStatus');
         const contentContainer = document.getElementById('contentContainer');
 
-        loadingBox.style.display = 'block';
-        contentContainer.style.opacity = '0.4';
+        database.ref().on('value', (snapshot) => {
+            loadingBox.style.display = 'none';
+            contentContainer.style.display = 'block';
 
-        try {
-            const response = await fetch(SCRIPT_URL);
-            if (!response.ok) throw new Error("Không thể kết nối với server!");
+            const data = snapshot.val() || {};
 
-            const data = await response.json();
+            const voSinhMoiObj = data.voSinhMoi || {};
+            const voSinhCoMaObj = data.voSinhCoMa || {};
 
-            rawVoSinhMoi = data.voSinhMoi || [];
-            rawVoSinhCoMa = data.voSinhCoMa || [];
+            // Chuyển Object Firebase thành Mảng dữ liệu
+            const rawVoSinhMoi = Object.values(voSinhMoiObj);
+            const rawVoSinhCoMa = Object.values(voSinhCoMaObj);
 
-            // Hiển thị trực tiếp toàn bộ dữ liệu
             renderTableMoi(rawVoSinhMoi);
             renderTableCoMa(rawVoSinhCoMa);
 
-            // Cập nhật thống kê
             document.getElementById('statNew').innerText = rawVoSinhMoi.length;
             document.getElementById('statExisting').innerText = rawVoSinhCoMa.length;
             document.getElementById('statTotal').innerText = rawVoSinhMoi.length + rawVoSinhCoMa.length;
 
             document.getElementById('countVoSinhMoi').innerText = rawVoSinhMoi.length;
             document.getElementById('countVoSinhCoMa').innerText = rawVoSinhCoMa.length;
-
-        } catch (error) {
-            console.error('Lỗi tải dữ liệu:', error);
-            alert('Lỗi tải dữ liệu: ' + error.message);
-        } finally {
-            loadingBox.style.display = 'none';
-            contentContainer.style.opacity = '1';
-        }
+        }, (error) => {
+            console.error('Lỗi khi lắng nghe dữ liệu Firebase:', error);
+            alert('Lỗi kết nối Realtime: ' + error.message);
+        });
     }
 
-    // Render bảng Võ sinh mới (Địa chỉ ở row[6])
     function renderTableMoi(dataList) {
         const tbMoi = document.getElementById('tb-vosinh-moi');
         tbMoi.innerHTML = '';
@@ -399,24 +398,21 @@
             return;
         }
 
-        dataList.forEach((row, index) => {
-            const diaChi = (row[6] !== undefined && String(row[6]).trim() !== '') ? row[6] : '---';
-
+        dataList.forEach((item, index) => {
             tbMoi.innerHTML += `
                 <tr>
                     <td class="stt-col">${index + 1}</td>
-                    <td><span class="badge badge-location">${row[1] || '---'}</span></td>
-                    <td><strong>${row[2] || '---'}</strong></td>
-                    <td>${formatDate(row[3])}</td>
-                    <td>${row[4] || '---'}</td>
-                    <td>${row[5] || '---'}</td>
-                    <td>${diaChi}</td>
+                    <td><span class="badge badge-location">${item.diemTap || '---'}</span></td>
+                    <td><strong>${item.name || '---'}</strong></td>
+                    <td>${formatDate(item.dob)}</td>
+                    <td>${item.gender || '---'}</td>
+                    <td>${item.cccd || '---'}</td>
+                    <td>${item.address || '---'}</td>
                 </tr>
             `;
         });
     }
 
-    // Render bảng Võ sinh đã có mã (Cấp dự thi ở row[7] hoặc row[6])
     function renderTableCoMa(dataList) {
         const tbCoMa = document.getElementById('tb-vosinh-coma');
         tbCoMa.innerHTML = '';
@@ -426,29 +422,22 @@
             return;
         }
 
-        dataList.forEach((row, index) => {
-            let capDuThi = '---';
-            if (row[7] !== undefined && String(row[7]).trim() !== '') {
-                capDuThi = row[7];
-            } else if (row[6] !== undefined && String(row[6]).trim() !== '') {
-                capDuThi = row[6];
-            }
-
+        dataList.forEach((item, index) => {
             tbCoMa.innerHTML += `
                 <tr>
                     <td class="stt-col">${index + 1}</td>
-                    <td><span class="badge badge-location">${row[1] || '---'}</span></td>
-                    <td class="vtf-code">${row[2] || '---'}</td>
-                    <td><strong>${row[3] || '---'}</strong></td>
-                    <td>${row[4] || '---'}</td>
-                    <td>${formatDate(row[5])}</td>
-                    <td><span class="badge badge-cap">${capDuThi}</span></td>
+                    <td><span class="badge badge-location">${item.diemTap || '---'}</span></td>
+                    <td class="vtf-code">${item.id || '---'}</td>
+                    <td><strong>${item.name || '---'}</strong></td>
+                    <td>${item.gender || '---'}</td>
+                    <td>${formatDate(item.dob)}</td>
+                    <td><span class="badge badge-cap">${item.targetCap || '---'}</span></td>
                 </tr>
             `;
         });
     }
 
-    window.onload = loadData;
+    window.onload = startRealtimeListener;
 </script>
 
 </body>
