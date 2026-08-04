@@ -18,7 +18,7 @@
             background-image: linear-gradient(rgba(244, 247, 246, 0.9), rgba(244, 247, 246, 0.9)), url('logo.jpg');
             background-repeat: no-repeat;
             background-position: center;
-            background-size: 500px; /* Kích thước logo chìm ở nền */
+            background-size: 500px;
             
             color: #333;
             display: flex;
@@ -31,11 +31,11 @@
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.92); /* Nền trắng hơi trong suốt để nổi bật trên watermark */
-            padding: 20px 50px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 25px 40px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
+            max-width: 580px;
             width: 100%;
             backdrop-filter: blur(5px);
         }
@@ -53,14 +53,14 @@
 
         h1 {
             margin-bottom: 8px;
-            color: #d9534f; /* Màu đỏ nhận diện thương hiệu Taekwondo */
+            color: #d9534f;
             font-size: 24px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         h2 {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             color: #2c3e50;
             font-size: 20px;
             font-weight: 500;
@@ -69,15 +69,18 @@
         .tab-menu {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .tab-btn {
             text-decoration: none;
-            padding: 12px 28px;
-            font-size: 16px;
+            padding: 12px 22px;
+            font-size: 15px;
             font-weight: 600;
             border-radius: 8px;
+            border: none;
+            cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
@@ -106,6 +109,98 @@
         .tab-btn.list:hover {
             background-color: #27ae60;
         }
+
+        /* Nút Tab Kết Quả */
+        .tab-btn.result {
+            background-color: #e67e22;
+            color: white;
+        }
+
+        .tab-btn.result:hover {
+            background-color: #d35400;
+        }
+
+        /* ==========================================
+           STYLE CHO CỬA SỔ NỔI (MODAL POPUP)
+           ========================================== */
+        .modal {
+            display: none; /* Ẩn mặc định */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .modal.active {
+            display: flex; /* Hiển thị khi được gọi */
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            height: 98vh;
+            max-width: 1260px;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: scaleUp 0.25s ease-out;
+        }
+
+        /* Nút đóng Popup */
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        /* Khung hiển thị nội dung trang con */
+        .modal-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+
+        /* Hiệu ứng hiển thị mượt mà */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -118,13 +213,53 @@
         <h2>Hệ Thống Quản Lý Thi Cấp</h2>
         
         <div class="tab-menu">
-            <!-- Mở trang đăng ký ở tab mới -->
-            <a href="dangky.html" target="_blank" class="tab-btn register">Đăng Ký</a>
-            
-            <!-- Mở trang danh sách ở tab mới -->
-            <a href="danhsach.html" target="_blank" class="tab-btn list">Xem Danh Sách</a>
+            <!-- Thay đổi thẻ <a> sang nút gọi hàm mở Modal -->
+            <button type="button" onclick="openModal('dangky.html')" class="tab-btn register">Đăng Ký</button>
+            <button type="button" onclick="openModal('danhsach.html')" class="tab-btn list">Xem Danh Sách</button>
+            <button type="button" onclick="openModal('ketqua.html')" class="tab-btn result">Kết Quả</button>
         </div>
     </div>
+
+    <!-- Khung Popup Cửa Sổ Nổi -->
+    <div id="popupModal" class="modal">
+        <div class="modal-content">
+            <button type="button" class="close-btn" onclick="closeModal()" title="Đóng">&times;</button>
+            <iframe id="modalIframe" class="modal-iframe" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Mở Cửa sổ nổi
+        function openModal(url) {
+            const modal = document.getElementById('popupModal');
+            const iframe = document.getElementById('modalIframe');
+            iframe.src = url;
+            modal.classList.add('active');
+        }
+
+        // Đóng Cửa sổ nổi và dọn bộ nhớ iframe
+        function closeModal() {
+            const modal = document.getElementById('popupModal');
+            const iframe = document.getElementById('modalIframe');
+            modal.classList.remove('active');
+            iframe.src = ''; 
+        }
+
+        // Đóng khi click ra ngoài vùng khung nội dung
+        window.onclick = function(event) {
+            const modal = document.getElementById('popupModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        // Đóng khi người dùng bấm phím ESC trên bàn phím
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
 
 </body>
 </html>
