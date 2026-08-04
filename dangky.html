@@ -44,7 +44,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1250px;
             margin: 0 auto;
             background: var(--card-bg);
             border-radius: 10px;
@@ -71,8 +71,53 @@
         }
 
         .form-body {
-            padding: 15px;
+            padding: 10px;
         }
+
+        /* --- STYLES BỘ NÚT CHUYỂN TAB --- */
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: #cbd5e1;
+            color: #1e293b;
+        }
+
+        .tab-btn.active {
+            background: #1e3c72;
+            color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+        /* --------------------------------- */
 
         .section-box {
             background: #fff;
@@ -451,120 +496,139 @@
     <div class="form-body">
         <form id="registrationForm" onsubmit="event.preventDefault(); handleSubmit();">
             
-            <!-- 1/ Điểm tập & Tra Mã hội viên -->
-            <div class="section-box">
-                <div class="section-title">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <span>1. Điểm tập & Tra mã hội viên</span>
-                </div>
-                
-                <div class="section-1-grid">
-                    <div>
-                        <label class="form-label" for="diemTapSelect">Chọn Điểm tập <span class="required">*</span></label>
-                        <select class="form-select" id="diemTapSelect" required>
-                            <option value="" disabled selected>-- Chọn --</option>
-                            <option value="75HM">75HM</option>
-                            <option value="HUBT">HUBT</option>
-                            <option value="USSH">USSH</option>
-                        </select>
-                    </div>
-
-                    <div class="lookup-box">
-                        <label class="form-label" for="searchNamesTextarea">Tra mã hội viên</label>
-                        <textarea class="form-control" id="searchNamesTextarea" placeholder="Nguyễn Văn A&#10;... Có thể xuống dòng hoặc phân cách bởi dấu phẩy"></textarea>
-                        <button type="button" class="btn btn-primary" id="btnSearchNames" onclick="searchVtfByNames()" style="width: 100%; justify-content: center;">
-                            <i class="fa-solid fa-magnifying-glass"></i> Tra cứu
-                        </button>
-                    </div>
-                </div>
-
-                <div id="searchNameResultContainer" style="margin-top: 10px;"></div>
+            <!-- DANH SÁCH NÚT CHUYỂN TAB -->
+            <div class="tabs-nav">
+                <button type="button" class="tab-btn active" onclick="switchTab('tab-pane-1', this)">
+                    <i class="fa-solid fa-location-dot"></i> 1. Điểm tập & Tra mã
+                </button>
+                <button type="button" class="tab-btn" onclick="switchTab('tab-pane-2', this)">
+                    <i class="fa-solid fa-users"></i> 2. Võ sinh mới
+                </button>
+                <button type="button" class="tab-btn" onclick="switchTab('tab-pane-3', this)">
+                    <i class="fa-solid fa-id-badge"></i> 3. Võ sinh đã có mã VTF
+                </button>
             </div>
 
-            <!-- 2/ Võ sinh mới -->
-            <div class="section-box" id="section-new-students">
-                <div class="section-title">
-                    <i class="fa-solid fa-users"></i>
-                    <span>2. Võ sinh mới (Chưa có mã hội viên)</span>
-                </div>
-
-                <div class="form-group form-group-inline" style="margin-bottom: 20px;">
-                    <label class="form-label">Đăng ký mã võ sinh mới <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="hasNewStudents" value="no" checked onchange="toggleNewStudentsSection(false)"> Không
-                        </label>                        
-                        <label class="radio-label">
-                            <input type="radio" name="hasNewStudents" value="yes" onchange="toggleNewStudentsSection(true)"> Có
-                        </label>
+            <!-- TAB 1: Điểm tập & Tra Mã hội viên -->
+            <div id="tab-pane-1" class="tab-pane active">
+                <div class="section-box">
+                    <div class="section-title">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>1. Điểm tập & Tra mã hội viên</span>
                     </div>
-                </div>
-
-                <div id="newStudentsContainer" style="display: none;">
-                    <div class="toolbar">
-                        <div class="btn-group-left">
-                            <button type="button" class="btn btn-success" onclick="downloadExcelTemplate()">
-                                <i class="fa-solid fa-download"></i> Tải File Mẫu
-                            </button>
-                            <button type="button" class="btn btn-primary" onclick="triggerExcelImport()">
-                                <i class="fa-solid fa-file-excel"></i> Nhập từ Excel
-                            </button>
-                            <input type="file" id="excelFileInput" class="hidden-file-input" accept=".xlsx, .xls, .csv" onchange="handleExcelImport(event)">
+                    
+                    <div class="section-1-grid">
+                        <div>
+                            <label class="form-label" for="diemTapSelect">Chọn Điểm tập <span class="required">*</span></label>
+                            <select class="form-select" id="diemTapSelect" required>
+                                <option value="" disabled selected>-- Chọn --</option>
+                                <option value="75HM">75HM</option>
+                                <option value="HUBT">HUBT</option>
+                                <option value="USSH">USSH</option>
+                            </select>
                         </div>
-                        <button type="button" class="btn btn-outline-primary" onclick="addNewRow()">
-                            <i class="fa-solid fa-plus"></i> Thêm 1 dòng
-                        </button>
+
+                        <div class="lookup-box">
+                            <label class="form-label" for="searchNamesTextarea">Tra mã hội viên</label>
+                            <textarea class="form-control" id="searchNamesTextarea" placeholder="Nguyễn Văn A&#10;... Có thể xuống dòng hoặc phân cách bởi dấu phẩy"></textarea>
+                            <button type="button" class="btn btn-primary" id="btnSearchNames" onclick="searchVtfByNames()" style="width: 100%; justify-content: center;">
+                                <i class="fa-solid fa-magnifying-glass"></i> Tra cứu
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table id="newStudentsTable">
-                            <thead>
-                                <tr>
-                                    <th class="stt-col">STT</th>
-                                    <th>HỌ VÀ TÊN <span class="required">*</span></th>
-                                    <th>NGÀY SINH <span class="required">*</span></th>
-                                    <th>GIỚI TÍNH <span class="required">*</span></th>
-                                    <th>CCCD</th>
-                                    <th>ĐỊA CHỈ</th>
-                                    <th>VĂN HÓA</th>
-                                    <th style="text-align: center; width: 60px;"><i class="fa-solid fa-gear"></i></th>
-                                </tr>
-                            </thead>
-                            <tbody id="newStudentsTbody">
-                                <!-- Dynamic Rows -->
-                            </tbody>
-                        </table>
+                    <div id="searchNameResultContainer" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 2: Võ sinh mới -->
+            <div id="tab-pane-2" class="tab-pane">
+                <div class="section-box" id="section-new-students">
+                    <div class="section-title">
+                        <i class="fa-solid fa-users"></i>
+                        <span>2. Võ sinh mới (Chưa có mã hội viên)</span>
+                    </div>
+
+                    <div class="form-group form-group-inline" style="margin-bottom: 20px;">
+                        <label class="form-label">Đăng ký mã võ sinh mới <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="hasNewStudents" value="no" checked onchange="toggleNewStudentsSection(false)"> Không
+                            </label>                        
+                            <label class="radio-label">
+                                <input type="radio" name="hasNewStudents" value="yes" onchange="toggleNewStudentsSection(true)"> Có
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="newStudentsContainer" style="display: none;">
+                        <div class="toolbar">
+                            <div class="btn-group-left">
+                                <button type="button" class="btn btn-success" onclick="downloadExcelTemplate()">
+                                    <i class="fa-solid fa-download"></i> Tải File Mẫu
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="triggerExcelImport()">
+                                    <i class="fa-solid fa-file-excel"></i> Nhập từ Excel
+                                </button>
+                                <input type="file" id="excelFileInput" class="hidden-file-input" accept=".xlsx, .xls, .csv" onchange="handleExcelImport(event)">
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" onclick="addNewRow()">
+                                <i class="fa-solid fa-plus"></i> Thêm 1 dòng
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table id="newStudentsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="stt-col">STT</th>
+                                        <th>HỌ VÀ TÊN <span class="required">*</span></th>
+                                        <th>NGÀY SINH <span class="required">*</span></th>
+                                        <th>GIỚI TÍNH <span class="required">*</span></th>
+                                        <th>CCCD</th>
+                                        <th>ĐỊA CHỈ</th>
+                                        <th>VĂN HÓA</th>
+                                        <th style="text-align: center; width: 60px;"><i class="fa-solid fa-gear"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="newStudentsTbody">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 3/ Võ sinh đã có mã hội viên -->
-            <div class="section-box" id="section-existing-students">
-                <div class="section-title">
-                    <i class="fa-solid fa-id-badge"></i>
-                    <span>3. Võ sinh đã có mã hội viên (VTF ID)</span>
-                </div>
-
-                <div class="member-lookup-grid">
-                    <div class="lookup-box">
-                        <label class="form-label" for="vtfIdTextarea">Dán danh sách mã hội viên</label>
-                        <textarea class="form-control" id="vtfIdTextarea" style="min-height: 180px;" placeholder="V26-123456&#10;... Có thể xuống dòng hoặc dấu phẩy"></textarea>
-                        <button type="button" class="btn btn-primary" id="btnVerify" style="width: 100%; justify-content: center;" onclick="verifyVtfIds()">
-                            <i class="fa-solid fa-shield-halved"></i> Kiểm tra mã & cấp dự thi
-                        </button>
+            <!-- TAB 3: Võ sinh đã có mã hội viên -->
+            <div id="tab-pane-3" class="tab-pane">
+                <div class="section-box" id="section-existing-students">
+                    <div class="section-title">
+                        <i class="fa-solid fa-id-badge"></i>
+                        <span>3. Võ sinh đã có mã hội viên (VTF ID)</span>
                     </div>
 
-                    <div class="result-box">
-                        <div id="vtfResultContainer">
-                            <div class="empty-placeholder">
-                                Dữ liệu sẽ hiện ở đây sau khi kiểm tra...
+                    <div class="member-lookup-grid">
+                        <div class="lookup-box">
+                            <label class="form-label" for="vtfIdTextarea">Dán danh sách mã hội viên</label>
+                            <textarea class="form-control" id="vtfIdTextarea" style="min-height: 180px;" placeholder="V26-123456&#10;... Có thể xuống dòng hoặc dấu phẩy"></textarea>
+                            <button type="button" class="btn btn-primary" id="btnVerify" style="width: 100%; justify-content: center;" onclick="verifyVtfIds()">
+                                <i class="fa-solid fa-shield-halved"></i> Kiểm tra mã & cấp dự thi
+                            </button>
+                        </div>
+
+                        <div class="result-box">
+                            <div id="vtfResultContainer">
+                                <div class="empty-placeholder">
+                                    Dữ liệu sẽ hiện ở đây sau khi kiểm tra...
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Submit Button -->
+            <!-- Submit Button (Hiển thị cố định phía dưới các Tab) -->
             <div class="submit-section">
                 <button type="submit" class="btn btn-primary btn-submit" id="btnSubmit">
                     <i class="fa-solid fa-paper-plane"></i> Gửi Đăng Ký
@@ -590,16 +654,16 @@
 </div>
 
 <script>
-    // --- THAY THẾ BẰNG CẤU HÌNH FIREBASE CỦA BẠN TỪ BƯỚC 1 ---
+    // --- CẤU HÌNH FIREBASE ---
     const firebaseConfig = {
-  	apiKey: "AIzaSyDD2-w8VKQqHAVM_yrgzGQgVcJ0yDw8JhE",
-  	authDomain: "thicapbm-8f9fe.firebaseapp.com",
-  	databaseURL: "https://thicapbm-8f9fe-default-rtdb.asia-southeast1.firebasedatabase.app",
-  	projectId: "thicapbm-8f9fe",
-  	storageBucket: "thicapbm-8f9fe.firebasestorage.app",
-  	messagingSenderId: "1071870945646",
-  	appId: "1:1071870945646:web:3aab38930c2f08b7d7f97f",
-  	measurementId: "G-SVETDQBGFR"
+        apiKey: "AIzaSyDD2-w8VKQqHAVM_yrgzGQgVcJ0yDw8JhE",
+        authDomain: "thicapbm-8f9fe.firebaseapp.com",
+        databaseURL: "https://thicapbm-8f9fe-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "thicapbm-8f9fe",
+        storageBucket: "thicapbm-8f9fe.firebasestorage.app",
+        messagingSenderId: "1071870945646",
+        appId: "1:1071870945646:web:3aab38930c2f08b7d7f97f",
+        measurementId: "G-SVETDQBGFR"
     };
 
     // Khởi tạo Firebase
@@ -613,6 +677,21 @@
             addNewRow();
         }
     };
+
+    // Hàm chuyển Tab
+    function switchTab(tabId, btnElement) {
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        const panes = document.querySelectorAll('.tab-pane');
+        panes.forEach(pane => pane.classList.remove('active'));
+
+        const targetPane = document.getElementById(tabId);
+        if (targetPane) {
+            targetPane.classList.add('active');
+        }
+    }
 
     function toggleNewStudentsSection(show) {
         const container = document.getElementById('newStudentsContainer');
@@ -876,7 +955,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <strong style="color: #1e3c72; font-size: 14px;"><i class="fa-solid fa-circle-check" style="color: var(--success-color);"></i> Tìm thấy ${foundMatches.length} võ sinh:</strong>
                         <button type="button" class="btn btn-sm btn-success" onclick="copyIdsToSection3(\`${foundIdsString}\`)">
-                            <i class="fa-solid fa-arrow-down"></i> Chuyển toàn bộ mã này vào Mục 3
+                            <i class="fa-solid fa-arrow-right"></i> Chuyển toàn bộ mã này sang Tab 3
                         </button>
                     </div>
                     <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
@@ -930,6 +1009,7 @@
         }
     }
 
+    // Tự động sao chép mã và tự động chuyển hẳn sang Tab 3 để kiểm tra mã
     function copyIdsToSection3(idsString) {
         const textarea3 = document.getElementById('vtfIdTextarea');
         const currentVal = textarea3.value.trim();
@@ -938,7 +1018,12 @@
         } else {
             textarea3.value = idsString;
         }
-        document.getElementById('section-existing-students').scrollIntoView({ behavior: 'smooth' });
+
+        // Tự động chọn Tab 3
+        const tab3Btn = document.querySelectorAll('.tab-btn')[2];
+        switchTab('tab-pane-3', tab3Btn);
+
+        // Chạy xác thực danh sách mã
         verifyVtfIds();
     }
 
@@ -1151,7 +1236,10 @@
         const btnSubmit = document.getElementById('btnSubmit');
 
         if (!diemTap) {
-            alert('Vui lòng chọn Điểm tập ở Mục 1!');
+            alert('Vui lòng chọn Điểm tập ở Tab 1!');
+            // Tự chuyển sang Tab 1 nếu chưa chọn điểm tập
+            const tab1Btn = document.querySelectorAll('.tab-btn')[0];
+            switchTab('tab-pane-1', tab1Btn);
             document.getElementById('diemTapSelect').focus();
             return;
         }
@@ -1176,6 +1264,9 @@
                 if (!name || !dob || !gender) {
                     alert(`Vui lòng điền đầy đủ Họ tên, Ngày sinh, Giới tính ở dòng số ${idx + 1} (Mục võ sinh mới)!`);
                     hasError = true;
+                    // Tự động mở Tab 2
+                    const tab2Btn = document.querySelectorAll('.tab-btn')[1];
+                    switchTab('tab-pane-2', tab2Btn);
                     return;
                 }
 
