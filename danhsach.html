@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh Sách (Realtime & Auto Sync)</title>
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK (v9 Compat) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -27,298 +27,57 @@
             --border-color: #dee2e6;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-color);
-            padding: 10px;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1250px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-            color: #fff;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 10px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 5px;
-            flex-wrap: wrap;
-        }
-
-        .realtime-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #10b981;
-            color: white;
-            font-size: 12px;
-            padding: 2px 10px;
-            border-radius: 12px;
-        }
-
-        .gsheet-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #0f9d58;
-            color: white;
-            font-size: 12px;
-            padding: 2px 10px;
-            border-radius: 12px;
-        }
-
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background: white;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.3); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-color); padding: 10px; line-height: 1.5; }
+        .container { max-width: 1250px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%); color: #fff; padding: 10px; border-radius: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 10px; position: sticky; top: 0; z-index: 100; }
+        .header h1 { font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            padding: 8px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-left: 4px solid var(--accent-color);
-        }
-
+        .status-container { display: flex; justify-content: center; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
+        .realtime-indicator { display: inline-flex; align-items: center; gap: 6px; background: #10b981; color: white; font-size: 12px; padding: 2px 10px; border-radius: 12px; }
+        .gsheet-indicator { display: inline-flex; align-items: center; gap: 6px; background: #0f9d58; color: white; font-size: 12px; padding: 2px 10px; border-radius: 12px; }
+        .pulse-dot { width: 8px; height: 8px; background: white; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.3); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.8; } }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .stat-card { background: var(--card-bg); padding: 8px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--accent-color); }
         .stat-card.success { border-left-color: var(--success-color); }
         .stat-card.warning { border-left-color: var(--warning-color); }
+        .stat-info h3 { font-size: 28px; font-weight: 700; color: #1e293b; }
+        .stat-info p { font-size: 14px; color: #64748b; font-weight: 500; }
+        .stat-icon { font-size: 28px; color: #94a3b8; }
 
-        .stat-info h3 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1e293b;
-        }
+        .tabs-nav { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; }
+        .tab-btn { background: #e2e8f0; color: #475569; border: none; padding: 10px 18px; font-size: 14px; font-weight: 600; border-radius: 8px 8px 0 0; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .tab-btn:hover { background: #cbd5e1; color: #1e293b; }
+        .tab-btn.active { background: var(--primary-color); color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
 
-        .stat-info p {
-            font-size: 14px;
-            color: #64748b;
-            font-weight: 500;
-        }
+        .section-card { background: var(--card-bg); border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 10px; }
+        .section-title { font-size: 16px; font-weight: 700; color: var(--primary-color); margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        .section-title-left { display: flex; align-items: center; gap: 10px; }
 
-        .stat-icon {
-            font-size: 28px;
-            color: #94a3b8;
-        }
+        .btn-download { background-color: var(--success-color); color: white; border: none; padding: 6px 14px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-download:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-download.accent { background-color: var(--accent-color); }
 
-        /* --- PHẦN GIAO DIỆN NÚT TAB MỚI --- */
-        .tabs-nav {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 5px;
-        }
-
-        .tab-btn {
-            background: #e2e8f0;
-            color: #475569;
-            border: none;
-            padding: 10px 18px;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tab-btn:hover {
-            background: #cbd5e1;
-            color: #1e293b;
-        }
-
-        .tab-btn.active {
-            background: var(--primary-color);
-            color: #ffffff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .tab-pane {
-            display: none;
-        }
-
-        .tab-pane.active {
-            display: block;
-        }
-        /* --------------------------------- */
-
-        .section-card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 10px;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 10px;
-        }
-
-        .section-title-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-download {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .btn-download:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .btn-download.accent {
-            background-color: var(--accent-color);
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow: auto;
-            max-height: 500px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        th {
-            background-color: #f1f5f9;
-            color: #334155;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 10px 12px;
-            border-bottom: 2px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            text-align: left;
-            white-space: nowrap;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        td {
-            padding: 9px 12px;
-            border-bottom: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            vertical-align: middle;
-        }
-
-        th:last-child, td:last-child {
-            border-right: none;
-        }
-
+        .table-responsive { width: 100%; overflow: auto; max-height: 500px; border: 1px solid var(--border-color); border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background-color: #f1f5f9; color: #334155; font-weight: 700; text-transform: uppercase; padding: 10px 12px; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); text-align: left; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+        td { padding: 9px 12px; border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); vertical-align: middle; }
+        th:last-child, td:last-child { border-right: none; }
         tr:nth-child(even) { background-color: #f8fafc; }
         tr:hover { background-color: #f1f5f9; }
 
-        .stt-col {
-            text-align: center;
-            font-weight: bold;
-            width: 50px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
+        .stt-col { text-align: center; font-weight: bold; width: 50px; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
         .badge-location { background-color: #e0f2fe; color: #0369a1; }
         .badge-cap { background-color: #dbeafe; color: #1e40af; }
         .vtf-code { color: #0d6efd; font-weight: 700; }
 
-        .loading-box {
-            text-align: center;
-            padding: 30px;
-            font-size: 15px;
-            color: var(--accent-color);
-            font-weight: 500;
-        }
-
-        .empty-row {
-            text-align: center;
-            color: #64748b;
-            font-style: italic;
-            padding: 20px !important;
-        }
+        .loading-box { text-align: center; padding: 30px; font-size: 15px; color: var(--accent-color); font-weight: 500; }
+        .empty-row { text-align: center; color: #64748b; font-style: italic; padding: 20px !important; }
     </style>
 </head>
 <body>
@@ -332,7 +91,6 @@
         </div>
     </div>
 
-    <!-- Stats Section -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-info">
@@ -357,16 +115,12 @@
         </div>
     </div>
 
-    <!-- Trạng thái kết nối -->
     <div id="loadingStatus" class="loading-box">
         <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
         <div style="margin-top: 10px;">Đang kết nối nhận dữ liệu trực tiếp...</div>
     </div>
 
-    <!-- Main Content Container -->
     <div id="contentContainer" style="display: none;">
-        
-        <!-- NÚT ĐỔI TAB (TABS NAVIGATION) -->
         <div class="tabs-nav">
             <button class="tab-btn active" onclick="switchTab('paneMoi', this)">
                 <i class="fa-solid fa-user-plus"></i> 1. Cấp mã mới (<span id="countMoi">0</span>)
@@ -376,7 +130,6 @@
             </button>
         </div>
 
-        <!-- TAB 1: BẢNG VÕ SINH MỚI -->
         <div id="paneMoi" class="tab-pane active">
             <div class="section-card">
                 <div class="section-title">
@@ -401,15 +154,12 @@
                                 <th>Địa chỉ</th>
                             </tr>
                         </thead>
-                        <tbody id="tb-vosinh-moi">
-                            <!-- Dynamic content -->
-                        </tbody>
+                        <tbody id="tb-vosinh-moi"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 2: BẢNG VÕ SINH ĐÃ CÓ MÃ -->
         <div id="paneCoMa" class="tab-pane">
             <div class="section-card">
                 <div class="section-title">
@@ -434,9 +184,7 @@
                                 <th>Cấp dự thi</th>
                             </tr>
                         </thead>
-                        <tbody id="tb-vosinh-coma">
-                            <!-- Dynamic content -->
-                        </tbody>
+                        <tbody id="tb-vosinh-coma"></tbody>
                     </table>
                 </div>
             </div>
@@ -446,10 +194,8 @@
 </div>
 
 <script>
-    // URL GOOGLE APPS SCRIPT
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgFdtQfR6piBF8j1Yk7GkJni3GAwG9p9AX88fCzsnNyR1NEB5QzQM46HWSGxnp2rVY/exec";
 
-    // Cấu hình Firebase Realtime Database
     const firebaseConfig = {
         apiKey: "AIzaSyDD2-w8VKQqHAVM_yrgzGQgVcJ0yDw8JhE",
         authDomain: "thicapbm-8f9fe.firebaseapp.com",
@@ -461,33 +207,20 @@
         measurementId: "G-SVETDQBGFR"
     };
 
-    // Khởi tạo Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Biến lưu trữ dữ liệu toàn cục
     let currentVoSinhMoi = [];
     let currentVoSinhCoMa = [];
     let previousDataLength = -1;
 
-    // Hàm chuyển Tab
     function switchTab(tabId, btnElement) {
-        // Xóa class active ở tất cả các tab-btn
-        const buttons = document.querySelectorAll('.tab-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
-
-        // Thêm class active cho tab được click
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         btnElement.classList.add('active');
 
-        // Ẩn toàn bộ các tab-pane
-        const panes = document.querySelectorAll('.tab-pane');
-        panes.forEach(pane => pane.classList.remove('active'));
-
-        // Hiển thị tab-pane tương ứng
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
         const targetPane = document.getElementById(tabId);
-        if (targetPane) {
-            targetPane.classList.add('active');
-        }
+        if (targetPane) targetPane.classList.add('active');
     }
 
     function formatDate(dateStr) {
@@ -499,13 +232,11 @@
         if (!isNaN(d.getTime())) {
             const day = String(d.getDate()).padStart(2, '0');
             const month = String(d.getMonth() + 1).padStart(2, '0');
-            const year = d.getFullYear();
-            return `${day}/${month}/${year}`;
+            return `${day}/${month}/${d.getFullYear()}`;
         }
         return str;
     }
 
-    // Lắng nghe cập nhật trực tiếp từ Firebase
     function startRealtimeListener() {
         const loadingBox = document.getElementById('loadingStatus');
         const contentContainer = document.getElementById('contentContainer');
@@ -515,122 +246,99 @@
             contentContainer.style.display = 'block';
 
             const data = snapshot.val() || {};
-
-            const voSinhMoiObj = data.voSinhMoi || {};
-            const voSinhCoMaObj = data.voSinhCoMa || {};
-
-            currentVoSinhMoi = Object.values(voSinhMoiObj);
-            currentVoSinhCoMa = Object.values(voSinhCoMaObj);
+            currentVoSinhMoi = Object.values(data.voSinhMoi || {});
+            currentVoSinhCoMa = Object.values(data.voSinhCoMa || {});
 
             renderTableMoi(currentVoSinhMoi);
             renderTableCoMa(currentVoSinhCoMa);
 
-            // Cập nhật số liệu trên thẻ thống kê & nút tab
+            const totalCount = currentVoSinhMoi.length + currentVoSinhCoMa.length;
             document.getElementById('statNew').innerText = currentVoSinhMoi.length;
             document.getElementById('statExisting').innerText = currentVoSinhCoMa.length;
-            document.getElementById('statTotal').innerText = currentVoSinhMoi.length + currentVoSinhCoMa.length;
+            document.getElementById('statTotal').innerText = totalCount;
 
             document.getElementById('countMoi').innerText = currentVoSinhMoi.length;
             document.getElementById('countVTF').innerText = currentVoSinhCoMa.length;
 
-            // Tự động đồng bộ với Google Sheets khi có dữ liệu mới
-            const totalCount = currentVoSinhMoi.length + currentVoSinhCoMa.length;
             if (totalCount !== previousDataLength) {
                 previousDataLength = totalCount;
                 autoSyncToGoogleSheet(currentVoSinhMoi, currentVoSinhCoMa);
             }
         }, (error) => {
-            console.error('Lỗi khi lắng nghe dữ liệu Firebase:', error);
+            console.error('Lỗi Realtime:', error);
             alert('Lỗi kết nối Realtime: ' + error.message);
         });
     }
 
-    // Hàm tự động gửi dữ liệu sang Google Sheets
     async function autoSyncToGoogleSheet(voSinhMoi, voSinhCoMa) {
-        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("DÁN_WEB_APP_URL")) return;
+        if (!GOOGLE_SCRIPT_URL) return;
 
         const gsheetStatus = document.getElementById("gsheetStatus");
         gsheetStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ĐANG ĐỒNG BỘ GOOGLE SHEETS...`;
-
-        const payload = {
-            voSinhMoi: voSinhMoi,
-            voSinhDaCoMa: voSinhCoMa
-        };
 
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ voSinhMoi, voSinhDaCoMa: voSinhCoMa })
             });
             gsheetStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> ĐÃ ĐỒNG BỘ GOOGLE SHEETS`;
         } catch (error) {
-            console.error("Lỗi tự động đồng bộ Google Sheets:", error);
+            console.error("Lỗi đồng bộ Google Sheets:", error);
             gsheetStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> LỖI ĐỒNG BỘ SHEET`;
         }
     }
 
+    // Tối ưu hóa DOM Rendering với Array.map().join('')
     function renderTableMoi(dataList) {
         const tbMoi = document.getElementById('tb-vosinh-moi');
-        tbMoi.innerHTML = '';
-
-        if (dataList.length === 0) {
+        if (!dataList.length) {
             tbMoi.innerHTML = '<tr><td colspan="7" class="empty-row">Không có dữ liệu võ sinh mới</td></tr>';
             return;
         }
 
-        dataList.forEach((item, index) => {
-            tbMoi.innerHTML += `
-                <tr>
-                    <td class="stt-col">${index + 1}</td>
-                    <td><span class="badge badge-location">${item.diemTap || '---'}</span></td>
-                    <td><strong>${item.name || '---'}</strong></td>
-                    <td>${formatDate(item.dob)}</td>
-                    <td>${item.gender || '---'}</td>
-                    <td>${item.cccd || '---'}</td>
-                    <td>${item.address || '---'}</td>
-                </tr>
-            `;
-        });
+        tbMoi.innerHTML = dataList.map((item, index) => `
+            <tr>
+                <td class="stt-col">${index + 1}</td>
+                <td><span class="badge badge-location">${item.diemTap || '---'}</span></td>
+                <td><strong>${item.name || '---'}</strong></td>
+                <td>${formatDate(item.dob)}</td>
+                <td>${item.gender || '---'}</td>
+                <td>${item.cccd || '---'}</td>
+                <td>${item.address || '---'}</td>
+            </tr>
+        `).join('');
     }
 
     function renderTableCoMa(dataList) {
         const tbCoMa = document.getElementById('tb-vosinh-coma');
-        tbCoMa.innerHTML = '';
-
-        if (dataList.length === 0) {
+        if (!dataList.length) {
             tbCoMa.innerHTML = '<tr><td colspan="7" class="empty-row">Không có dữ liệu võ sinh đã có mã VTF</td></tr>';
             return;
         }
 
-        dataList.forEach((item, index) => {
-            tbCoMa.innerHTML += `
-                <tr>
-                    <td class="stt-col">${index + 1}</td>
-                    <td><span class="badge badge-location">${item.diemTap || '---'}</span></td>
-                    <td class="vtf-code">${item.id || '---'}</td>
-                    <td><strong>${item.name || '---'}</strong></td>
-                    <td>${item.gender || '---'}</td>
-                    <td>${formatDate(item.dob)}</td>
-                    <td><span class="badge badge-cap">${item.targetCap || '---'}</span></td>
-                </tr>
-            `;
-        });
+        tbCoMa.innerHTML = dataList.map((item, index) => `
+            <tr>
+                <td class="stt-col">${index + 1}</td>
+                <td><span class="badge badge-location">${item.diemTap || '---'}</span></td>
+                <td class="vtf-code">${item.id || '---'}</td>
+                <td><strong>${item.name || '---'}</strong></td>
+                <td>${item.gender || '---'}</td>
+                <td>${formatDate(item.dob)}</td>
+                <td><span class="badge badge-cap">${item.targetCap || '---'}</span></td>
+            </tr>
+        `).join('');
     }
 
-    // Tải file Excel
     function downloadVoSinhMoi() {
-        if (currentVoSinhMoi.length === 0) {
+        if (!currentVoSinhMoi.length) {
             alert("Chưa có dữ liệu Võ sinh cấp mã mới để tải về!");
             return;
         }
-
-        let csvContent = "\uFEFF";
-        csvContent += "STT,Điểm tập,Họ và tên,Ngày sinh,Giới tính,CCCD,Địa chỉ\n";
-
+        let csvContent = "\uFEFFSTT,Điểm tập,Họ và tên,Ngày sinh,Giới tính,CCCD,Địa chỉ\n";
         currentVoSinhMoi.forEach((item, index) => {
-            const row = [
+            csvContent += [
                 index + 1,
                 `"${(item.diemTap || '---').replace(/"/g, '""')}"`,
                 `"${(item.name || '---').replace(/"/g, '""')}"`,
@@ -638,24 +346,19 @@
                 `"${(item.gender || '---').replace(/"/g, '""')}"`,
                 `"'${(item.cccd || '---').replace(/"/g, '""')}"`,
                 `"${(item.address || '---').replace(/"/g, '""')}"`
-            ];
-            csvContent += row.join(",") + "\n";
+            ].join(",") + "\n";
         });
-
         triggerDownload(csvContent, "VoSinh_CapMaMoi.csv");
     }
 
     function downloadVoSinhCoMa() {
-        if (currentVoSinhCoMa.length === 0) {
+        if (!currentVoSinhCoMa.length) {
             alert("Chưa có dữ liệu Võ sinh đã có mã VTF để tải về!");
             return;
         }
-
-        let csvContent = "\uFEFF";
-        csvContent += "STT,Điểm tập,Mã VTF,Họ và tên,Giới tính,Ngày sinh,Cấp dự thi\n";
-
+        let csvContent = "\uFEFFSTT,Điểm tập,Mã VTF,Họ và tên,Giới tính,Ngày sinh,Cấp dự thi\n";
         currentVoSinhCoMa.forEach((item, index) => {
-            const row = [
+            csvContent += [
                 index + 1,
                 `"${(item.diemTap || '---').replace(/"/g, '""')}"`,
                 `"'${(item.id || '---').replace(/"/g, '""')}"`,
@@ -663,19 +366,16 @@
                 `"${(item.gender || '---').replace(/"/g, '""')}"`,
                 `"${formatDate(item.dob)}"`,
                 `"${(item.targetCap || '---').replace(/"/g, '""')}"`
-            ];
-            csvContent += row.join(",") + "\n";
+            ].join(",") + "\n";
         });
-
         triggerDownload(csvContent, "VoSinh_DaCoMaVTF.csv");
     }
 
     function triggerDownload(csvContent, fileName) {
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", fileName);
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -683,6 +383,5 @@
 
     window.onload = startRealtimeListener;
 </script>
-
 </body>
 </html>
