@@ -111,7 +111,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>ĐĂNG KÝ THI</h1>
+        <h1>ĐĂNG KÝ THI CẤP</h1>
     </div>
 
     <div class="form-body">
@@ -119,13 +119,13 @@
             
             <div class="tabs-nav">
                 <button type="button" class="tab-btn active" onclick="switchTab('tab-pane-1', this)">
-                    <i class="fa-solid fa-location-dot"></i> 1. Điểm tập & Tra mã
+                    <i class="fa-solid fa-location-dot"></i> 1. Điểm tập
                 </button>
                 <button type="button" class="tab-btn" onclick="switchTab('tab-pane-2', this)">
-                    <i class="fa-solid fa-users"></i> 2. Võ sinh mới
+                    <i class="fa-solid fa-users"></i> 2. Võ sinh mới (Cấp 10)
                 </button>
                 <button type="button" class="tab-btn" onclick="switchTab('tab-pane-3', this)">
-                    <i class="fa-solid fa-id-badge"></i> 3. Võ sinh đã có mã VTF
+                    <i class="fa-solid fa-id-badge"></i> 3. Võ sinh đã có mã
                 </button>
             </div>
 
@@ -134,7 +134,7 @@
                 <div class="section-box">
                     <div class="section-title">
                         <i class="fa-solid fa-location-dot"></i>
-                        <span>1. Điểm tập & Tra mã hội viên</span>
+                        <span>1. Đăng ký điểm tập & Kiểm tra mã hội viên</span>
                     </div>
                     
                     <div class="section-1-grid">
@@ -149,8 +149,8 @@
                         </div>
 
                         <div class="lookup-box">
-                            <label class="form-label" for="searchNamesTextarea">Tra mã hội viên</label>
-                            <textarea class="form-control" id="searchNamesTextarea" placeholder="Nguyễn Văn A&#10;... Có thể xuống dòng hoặc phân cách bởi dấu phẩy"></textarea>
+                            <label class="form-label" for="searchNamesTextarea">Tra mã hội viên (VTF_ID)</label>
+                            <textarea class="form-control" id="searchNamesTextarea" placeholder="Nguyễn Văn A&#10;... Có thể xuống dòng hoặc dấu phẩy"></textarea>
                             <button type="button" class="btn btn-primary" id="btnSearchNames" onclick="searchVtfByNames()" style="width: 100%; justify-content: center;">
                                 <i class="fa-solid fa-magnifying-glass"></i> Tra cứu
                             </button>
@@ -166,11 +166,11 @@
                 <div class="section-box" id="section-new-students">
                     <div class="section-title">
                         <i class="fa-solid fa-users"></i>
-                        <span>2. Võ sinh mới (Chưa có mã hội viên)</span>
+                        <span>2. Danh sách cấp mã</span>
                     </div>
 
                     <div class="form-group form-group-inline" style="margin-bottom: 20px;">
-                        <label class="form-label">Đăng ký mã võ sinh mới <span class="required">*</span></label>
+                        <label class="form-label">Võ sinh mới <span class="required">*</span></label>
                         <div class="radio-group">
                             <label class="radio-label">
                                 <input type="radio" name="hasNewStudents" value="no" checked onchange="toggleNewStudentsSection(false)"> Không
@@ -223,21 +223,21 @@
                 <div class="section-box" id="section-existing-students">
                     <div class="section-title">
                         <i class="fa-solid fa-id-badge"></i>
-                        <span>3. Võ sinh đã có mã hội viên (VTF ID)</span>
+                        <span>3. Danh sách đăng ký</span>
                     </div>
 
                     <div class="member-lookup-grid">
                         <div class="lookup-box">
-                            <label class="form-label" for="vtfIdTextarea">Dán danh sách mã hội viên</label>
+                            <label class="form-label" for="vtfIdTextarea">Nhập/Dán mã VTF</label>
                             <textarea class="form-control" id="vtfIdTextarea" style="min-height: 180px;" placeholder="V26-123456&#10;... Có thể xuống dòng hoặc dấu phẩy"></textarea>
                             <button type="button" class="btn btn-primary" id="btnVerify" style="width: 100%; justify-content: center;" onclick="verifyVtfIds()">
-                                <i class="fa-solid fa-shield-halved"></i> Kiểm tra mã & cấp dự thi
+                                <i class="fa-solid fa-shield-halved"></i> Kiểm tra mã & Cấp dự thi
                             </button>
                         </div>
 
                         <div class="result-box">
                             <div id="vtfResultContainer">
-                                <div class="empty-placeholder">Dữ liệu sẽ hiện ở đây sau khi kiểm tra...</div>
+                                <div class="empty-placeholder">Dữ liệu sau khi kiểm tra...</div>
                             </div>
                         </div>
                     </div>
