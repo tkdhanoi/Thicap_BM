@@ -140,8 +140,9 @@
                     <div class="section-1-grid">
                         <div>
                             <label class="form-label" for="diemTapSelect">Chọn Điểm tập <span class="required"></span></label>
-                            <select class="form-select" id="diemTapSelect" required>
-                                <option value="" disabled selected>-- Chọn --</option>
+                            <!-- Đã bỏ thuộc tính required native của HTML để tránh bị bỏ qua khi Tab 1 ẩn -->
+                            <select class="form-select" id="diemTapSelect">
+                                <option value="" disabled selected>-- Chọn điểm tập --</option>
                                 <option value="75HM">75HM</option>
                                 <option value="HUBT">HUBT</option>
                                 <option value="USSH">USSH</option>
@@ -290,7 +291,15 @@
 
     function switchTab(tabId, btnElement) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        btnElement.classList.add('active');
+        if (btnElement) {
+            btnElement.classList.add('active');
+        } else {
+            // Tự động tìm tab button tương ứng nếu không truyền btnElement trực tiếp
+            const buttons = document.querySelectorAll('.tab-btn');
+            if (tabId === 'tab-pane-1') buttons[0]?.classList.add('active');
+            if (tabId === 'tab-pane-2') buttons[1]?.classList.add('active');
+            if (tabId === 'tab-pane-3') buttons[2]?.classList.add('active');
+        }
 
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
         const targetPane = document.getElementById(tabId);
@@ -754,17 +763,21 @@
     }
 
     async function handleSubmit() {
-        const diemTap = document.getElementById('diemTapSelect').value;
+        const diemTapSelect = document.getElementById('diemTapSelect');
+        const diemTap = diemTapSelect ? diemTapSelect.value.trim() : '';
         const btnSubmit = document.getElementById('btnSubmit');
 
+        // 1. CẢNH BÁO BẮT BUỘC: (Tab 1)
         if (!diemTap) {
-            alert('Vui lòng chọn Điểm tập ở Tab 1!');
-            switchTab('tab-pane-1', document.querySelectorAll('.tab-btn')[0]);
-            document.getElementById('diemTapSelect').focus();
+            alert('⚠️ BẠN CHƯA CHỌN ĐIỂM TẬP!\n\nChọn Điểm tập ở Tab 1.');
+            switchTab('tab-pane-1'); // Tự động đưa người dùng về lại Tab 1
+            diemTapSelect.focus();
             return;
         }
 
-        const hasNewStudentsChoice = document.querySelector('input[name="hasNewStudents"]:checked').value;
+        // 2. Thu thập dữ liệu Võ sinh mới (Tab 2)
+        const selectedRadio = document.querySelector('input[name="hasNewStudents"]:checked');
+        const hasNewStudentsChoice = selectedRadio ? selectedRadio.value : 'no';
         const newStudentsPayload = [];
 
         if (hasNewStudentsChoice === 'yes') {
@@ -773,19 +786,21 @@
 
             rows.forEach((row, idx) => {
                 if (hasError) return;
-                const name = row.querySelector('.input-name').value.trim();
-                const dob = row.querySelector('.input-dob').value.trim();
-                const gender = row.querySelector('.input-gender').value;
-                const cccd = row.querySelector('.input-cccd').value.trim();
-                const address = row.querySelector('.input-address').value.trim();
-                const culture = row.querySelector('.input-culture').value;
+                const name = row.querySelector('.input-name')?.value.trim() || '';
+                const dob = row.querySelector('.input-dob')?.value.trim() || '';
+                const gender = row.querySelector('.input-gender')?.value || '';
+                const cccd = row.querySelector('.input-cccd')?.value.trim() || '';
+                const address = row.querySelector('.input-address')?.value.trim() || '';
+                const culture = row.querySelector('.input-culture')?.value || '';
 
+                // Bỏ qua dòng hoàn toàn trống
                 if (!name && !dob && !gender && !cccd && !address && !culture) return;
 
-                if (!name || !dob || !gender) {
-                    alert(`Vui lòng điền đầy đủ Họ tên, Ngày sinh, Giới tính ở dòng số ${idx + 1} (Mục võ sinh mới)!`);
+                // Kiểm tra các trường bắt buộc đối với từng võ sinh mới
+                if (!name || !dob || !gender || !cccd || !address || !culture) {
+                    alert(`Hãy điền đầy đủ thông tin ở dòng số ${idx + 1} (Tab Võ sinh mới)!`);
                     hasError = true;
-                    switchTab('tab-pane-2', document.querySelectorAll('.tab-btn')[1]);
+                    switchTab('tab-pane-2');
                     return;
                 }
                 newStudentsPayload.push({ name, dob, gender, cccd, address, culture });
@@ -794,30 +809,40 @@
             if (hasError) return;
         }
 
+        // 3. Thu thập danh sách võ sinh cũ đã xác thực (Tab 3)
         const verifiedStudentsPayload = [];
         document.querySelectorAll('#validStudentsTable tbody tr.valid-student-row').forEach(row => {
             const cells = row.querySelectorAll('td');
             verifiedStudentsPayload.push({
                 id: row.getAttribute('data-id'),
-                name: cells[2].textContent.trim(),
-                gender: cells[3].textContent.trim(),
-                dob: cells[4].textContent.trim(),
-                currentCap: cells[5].textContent.trim(),
-                targetCap: row.querySelector('.valid-target-cap').value
+                name: cells[2]?.textContent.trim() || '',
+                gender: cells[3]?.textContent.trim() || '',
+                dob: cells[4]?.textContent.trim() || '',
+                currentCap: cells[5]?.textContent.trim() || '',
+                targetCap: row.querySelector('.valid-target-cap')?.value || ''
             });
         });
 
+        // 4. Kiểm tra xem có dữ liệu hợp lệ để gửi không
         if (!newStudentsPayload.length && !verifiedStudentsPayload.length) {
-            alert('Bạn chưa nhập danh sách Võ sinh mới hoặc chưa Xác thực mã Võ sinh cũ nào hợp lệ!');
+            alert('Chưa có danh sách Võ sinh mới hoặc chưa có Võ sinh cũ nào hợp lệ!');
             return;
         }
 
-        if (!confirm(`Xác nhận gửi đăng ký cho điểm tập [${diemTap}]?\n- Võ sinh mới: ${newStudentsPayload.length} người\n- Võ sinh có mã: ${verifiedStudentsPayload.length} người`)) {
-            return;
-        }
+        // 5. Xác nhận thông tin trước khi gửi
+        const isConfirmed = confirm(
+            `📌 XÁC NHẬN GỬI ĐĂNG KÝ THI CẤP\n\n` +
+            `• Điểm tập đăng ký: [ ${diemTap.toUpperCase()} ]\n` +
+            `• Số võ sinh mới (Cấp 10): ${newStudentsPayload.length} người\n` +
+            `• Số võ sinh đã có mã VTF: ${verifiedStudentsPayload.length} người\n\n` +
+            `Bạn có chắc chắn gửi dữ liệu không?`
+        );
 
+        if (!isConfirmed) return;
+
+        // 6. Xử lý lưu dữ liệu lên Firebase
         btnSubmit.disabled = true;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi dữ liệu lên Firebase...';
+        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi dữ liệu...';
 
         try {
             const updates = {};
@@ -847,7 +872,7 @@
 
         } catch (error) {
             console.error(error);
-            alert('Lỗi kết nối Firebase: ' + error.message);
+            alert('Lỗi kết nối CSDL Firebase: ' + error.message);
         } finally {
             btnSubmit.disabled = false;
             btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Gửi Đăng Ký';
