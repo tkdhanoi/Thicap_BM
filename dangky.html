@@ -140,7 +140,6 @@
                     <div class="section-1-grid">
                         <div>
                             <label class="form-label" for="diemTapSelect">Chọn Điểm tập <span class="required"></span></label>
-                            <!-- Đã bỏ thuộc tính required native của HTML để tránh bị bỏ qua khi Tab 1 ẩn -->
                             <select class="form-select" id="diemTapSelect">
                                 <option value="" disabled selected>-- Chọn điểm tập --</option>
                                 <option value="75HM">75HM</option>
@@ -294,7 +293,6 @@
         if (btnElement) {
             btnElement.classList.add('active');
         } else {
-            // Tự động tìm tab button tương ứng nếu không truyền btnElement trực tiếp
             const buttons = document.querySelectorAll('.tab-btn');
             if (tabId === 'tab-pane-1') buttons[0]?.classList.add('active');
             if (tabId === 'tab-pane-2') buttons[1]?.classList.add('active');
@@ -387,6 +385,35 @@
     function updateSTT() {
         document.querySelectorAll('#newStudentsTbody tr').forEach((row, index) => {
             row.querySelector('.stt-col').textContent = index + 1;
+        });
+    }
+
+    // CHỨC NĂNG MỚI: Xóa dòng và cập nhật lại danh sách võ sinh hợp lệ (Tab 3)
+    function deleteValidStudentRow(btn) {
+        const row = btn.closest('tr');
+        if (row) {
+            row.remove();
+            updateValidStudentsSTT();
+        }
+    }
+
+    function updateValidStudentsSTT() {
+        const rows = document.querySelectorAll('#validStudentsTable tbody tr.valid-student-row');
+        const countText = document.getElementById('validStudentCount');
+        const container = document.getElementById('vtfResultContainer');
+
+        if (rows.length === 0) {
+            container.innerHTML = `<div class="empty-placeholder" style="color: var(--danger-color);">Không có mã VTF ID nào hợp lệ để hiển thị.</div>`;
+            return;
+        }
+
+        if (countText) {
+            countText.textContent = String(rows.length).padStart(2, '0');
+        }
+
+        rows.forEach((r, idx) => {
+            const sttTd = r.querySelector('.stt-col');
+            if (sttTd) sttTd.textContent = idx + 1;
         });
     }
 
@@ -676,6 +703,7 @@
             });
 
             if (validList.length > 0) {
+                // Đã thêm nút xóa dòng vào từng hàng trong danh sách hợp lệ
                 const rowsHtml = validList.map((item, idx) => `
                     <tr class="valid-student-row" data-id="${item.id}">
                         <td class="stt-col">${idx + 1}</td>
@@ -689,12 +717,17 @@
                                 ${generateCapOptions(item.targetCap)}
                             </select>
                         </td>
+                        <td style="text-align: center;">
+                            <button type="button" class="btn btn-danger" onclick="deleteValidStudentRow(this)" title="Xóa võ sinh này">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
                     </tr>
                 `).join('');
 
                 container.innerHTML = `
                     <div style="margin-bottom: 10px; font-weight: bold; color: var(--success-color); font-size: 13px;">
-                        <i class="fa-solid fa-circle-check"></i> DANH SÁCH HỢP LỆ - ${String(validList.length).padStart(2, '0')} VÕ SINH
+                        <i class="fa-solid fa-circle-check"></i> DANH SÁCH HỢP LỆ - <span id="validStudentCount">${String(validList.length).padStart(2, '0')}</span> VÕ SINH
                     </div>
                     <div class="table-responsive" style="max-height: 300px;">
                         <table id="validStudentsTable">
@@ -707,6 +740,7 @@
                                     <th>NGÀY SINH</th>
                                     <th>CẤP HIỆN TẠI</th>
                                     <th>CẤP DỰ THI</th>
+                                    <th style="text-align: center; width: 60px;"><i class="fa-solid fa-gear"></i></th>
                                 </tr>
                             </thead>
                             <tbody>${rowsHtml}</tbody>
@@ -723,7 +757,7 @@
             container.innerHTML = `<div style="font-size: 13px; color: var(--danger-color); padding: 10px;"><i class="fa-solid fa-circle-xmark"></i> Lỗi: ${error.message}</div>`;
         } finally {
             btnVerify.disabled = false;
-            btnVerify.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Kiểm tra mã & cấp dự thi';
+            btnVerify.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Kiểm tra mã & Cấp dự thi';
         }
     }
 
@@ -770,7 +804,7 @@
         // 1. CẢNH BÁO BẮT BUỘC: (Tab 1)
         if (!diemTap) {
             alert('⚠️ BẠN CHƯA CHỌN ĐIỂM TẬP!\n\nChọn Điểm tập ở Tab 1.');
-            switchTab('tab-pane-1'); // Tự động đưa người dùng về lại Tab 1
+            switchTab('tab-pane-1');
             diemTapSelect.focus();
             return;
         }
@@ -793,10 +827,8 @@
                 const address = row.querySelector('.input-address')?.value.trim() || '';
                 const culture = row.querySelector('.input-culture')?.value || '';
 
-                // Bỏ qua dòng hoàn toàn trống
                 if (!name && !dob && !gender && !cccd && !address && !culture) return;
 
-                // Kiểm tra các trường bắt buộc đối với từng võ sinh mới
                 if (!name || !dob || !gender || !cccd || !address || !culture) {
                     alert(`Hãy điền đầy đủ thông tin ở dòng số ${idx + 1} (Tab Võ sinh mới)!`);
                     hasError = true;
