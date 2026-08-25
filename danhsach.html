@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- SheetJS (Xuất Excel chuẩn định dạng cột và style) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -62,15 +64,21 @@
         .btn-download:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-download.accent { background-color: var(--accent-color); }
 
+        .btn-delete { background-color: transparent; color: var(--danger-color); border: 1px solid var(--danger-color); padding: 4px 8px; font-size: 12px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+        .btn-delete:hover { background-color: var(--danger-color); color: white; }
+
         .table-responsive { width: 100%; overflow: auto; max-height: 500px; border: 1px solid var(--border-color); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { background-color: #f1f5f9; color: #334155; font-weight: 700; text-transform: uppercase; padding: 10px 12px; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); text-align: left; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+        
+        /* Đã cập nhật text-align: center cho dòng tiêu đề bảng */
+        th { background-color: #f1f5f9; color: #334155; font-weight: 700; text-transform: uppercase; padding: 10px 12px; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); text-align: center; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
         td { padding: 9px 12px; border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); vertical-align: middle; }
         th:last-child, td:last-child { border-right: none; }
         tr:nth-child(even) { background-color: #f8fafc; }
         tr:hover { background-color: #f1f5f9; }
 
         .stt-col { text-align: center; font-weight: bold; width: 50px; }
+        .action-col { text-align: center; width: 80px; }
         .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
         .badge-location { background-color: #e0f2fe; color: #0369a1; }
         .badge-cap { background-color: #dbeafe; color: #1e40af; }
@@ -152,6 +160,8 @@
                                 <th>Giới tính</th>
                                 <th>CCCD</th>
                                 <th>Địa chỉ</th>
+                                <th>Văn hóa</th>
+                                <th class="action-col">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody id="tb-vosinh-moi"></tbody>
@@ -182,6 +192,7 @@
                                 <th>Giới tính</th>
                                 <th>Ngày sinh</th>
                                 <th>Cấp dự thi</th>
+                                <th class="action-col">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody id="tb-vosinh-coma"></tbody>
@@ -246,8 +257,9 @@
             contentContainer.style.display = 'block';
 
             const data = snapshot.val() || {};
-            currentVoSinhMoi = Object.values(data.voSinhMoi || {});
-            currentVoSinhCoMa = Object.values(data.voSinhCoMa || {});
+            
+            currentVoSinhMoi = Object.entries(data.voSinhMoi || {}).map(([key, val]) => ({ _key: key, ...val }));
+            currentVoSinhCoMa = Object.entries(data.voSinhCoMa || {}).map(([key, val]) => ({ _key: key, ...val }));
 
             renderTableMoi(currentVoSinhMoi);
             renderTableCoMa(currentVoSinhCoMa);
@@ -290,11 +302,10 @@
         }
     }
 
-    // Tối ưu hóa DOM Rendering với Array.map().join('')
     function renderTableMoi(dataList) {
         const tbMoi = document.getElementById('tb-vosinh-moi');
         if (!dataList.length) {
-            tbMoi.innerHTML = '<tr><td colspan="7" class="empty-row">Không có dữ liệu võ sinh mới</td></tr>';
+            tbMoi.innerHTML = '<tr><td colspan="9" class="empty-row">Không có dữ liệu võ sinh mới</td></tr>';
             return;
         }
 
@@ -307,6 +318,10 @@
                 <td>${item.gender || '---'}</td>
                 <td>${item.cccd || '---'}</td>
                 <td>${item.address || '---'}</td>
+                <td>${item.culture || '---'}</td>
+                <td class="action-col">
+                    
+                </td>
             </tr>
         `).join('');
     }
@@ -314,7 +329,7 @@
     function renderTableCoMa(dataList) {
         const tbCoMa = document.getElementById('tb-vosinh-coma');
         if (!dataList.length) {
-            tbCoMa.innerHTML = '<tr><td colspan="7" class="empty-row">Không có dữ liệu võ sinh đã có mã VTF</td></tr>';
+            tbCoMa.innerHTML = '<tr><td colspan="8" class="empty-row">Không có dữ liệu võ sinh đã có mã VTF</td></tr>';
             return;
         }
 
@@ -327,58 +342,107 @@
                 <td>${item.gender || '---'}</td>
                 <td>${formatDate(item.dob)}</td>
                 <td><span class="badge badge-cap">${item.targetCap || '---'}</span></td>
+                <td class="action-col">
+                   
+                </td>
             </tr>
         `).join('');
     }
 
+    async function deleteStudent(path, key, name) {
+        if (!key) return;
+        const confirmDelete = confirm(`⚠️ BẠN CÓ CHẮC CHẮN MUỐN XÓA?\n\nVõ sinh: ${name || 'N/A'}\n\nDữ liệu sẽ bị xóa khỏi hệ thống và đồng bộ lại tự động.`);
+        if (!confirmDelete) return;
+
+        try {
+            await database.ref(`${path}/${key}`).remove();
+        } catch (error) {
+            console.error("Lỗi xóa bản ghi:", error);
+            alert("Lỗi khi xóa dữ liệu: " + error.message);
+        }
+    }
+
+    // TẢI FILE EXCEL CẤP MÃ MỚI - Định dạng dòng 1 chữ đậm & căn giữa
     function downloadVoSinhMoi() {
         if (!currentVoSinhMoi.length) {
             alert("Chưa có dữ liệu Võ sinh cấp mã mới để tải về!");
             return;
         }
-        let csvContent = "\uFEFFSTT,Điểm tập,Họ và tên,Ngày sinh,Giới tính,CCCD,Địa chỉ\n";
+
+        const excelData = [
+            ["STT", "Điểm tập", "Họ và tên", "Ngày sinh", "Giới tính", "CCCD", "Địa chỉ", "Văn hóa"]
+        ];
+
         currentVoSinhMoi.forEach((item, index) => {
-            csvContent += [
+            excelData.push([
                 index + 1,
-                `"${(item.diemTap || '---').replace(/"/g, '""')}"`,
-                `"${(item.name || '---').replace(/"/g, '""')}"`,
-                `"${formatDate(item.dob)}"`,
-                `"${(item.gender || '---').replace(/"/g, '""')}"`,
-                `"'${(item.cccd || '---').replace(/"/g, '""')}"`,
-                `"${(item.address || '---').replace(/"/g, '""')}"`
-            ].join(",") + "\n";
+                item.diemTap || '---',
+                item.name || '---',
+                formatDate(item.dob),
+                item.gender || '---',
+                item.cccd ? String(item.cccd) : '---',
+                item.address || '---',
+                item.culture || '---'
+            ]);
         });
-        triggerDownload(csvContent, "VoSinh_CapMaMoi.csv");
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+        // ĐỊNH DẠNG DÒNG TIÊU ĐỀ (DÒNG 1) IN ĐẬM VÀ CĂN GIỮA
+        const headerRange = XLSX.utils.decode_range(ws['!ref']);
+        for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
+            if (!ws[cellAddress]) continue;
+            ws[cellAddress].s = {
+                font: { bold: true },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+        }
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "VoSinh_CapMaMoi");
+        XLSX.writeFile(wb, "VoSinh_CapMaMoi.xlsx");
     }
 
+    // TẢI FILE EXCEL ĐÃ CÓ MÃ VTF - Định dạng dòng 1 chữ đậm & căn giữa
     function downloadVoSinhCoMa() {
         if (!currentVoSinhCoMa.length) {
             alert("Chưa có dữ liệu Võ sinh đã có mã VTF để tải về!");
             return;
         }
-        let csvContent = "\uFEFFSTT,Điểm tập,Mã VTF,Họ và tên,Giới tính,Ngày sinh,Cấp dự thi\n";
-        currentVoSinhCoMa.forEach((item, index) => {
-            csvContent += [
-                index + 1,
-                `"${(item.diemTap || '---').replace(/"/g, '""')}"`,
-                `"'${(item.id || '---').replace(/"/g, '""')}"`,
-                `"${(item.name || '---').replace(/"/g, '""')}"`,
-                `"${(item.gender || '---').replace(/"/g, '""')}"`,
-                `"${formatDate(item.dob)}"`,
-                `"${(item.targetCap || '---').replace(/"/g, '""')}"`
-            ].join(",") + "\n";
-        });
-        triggerDownload(csvContent, "VoSinh_DaCoMaVTF.csv");
-    }
 
-    function triggerDownload(csvContent, fileName) {
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const excelData = [
+            ["STT", "Điểm tập", "Mã VTF", "Họ và tên", "Giới tính", "Ngày sinh", "Cấp dự thi"]
+        ];
+
+        currentVoSinhCoMa.forEach((item, index) => {
+            excelData.push([
+                index + 1,
+                item.diemTap || '---',
+                item.id || '---',
+                item.name || '---',
+                item.gender || '---',
+                formatDate(item.dob),
+                item.targetCap || '---'
+            ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+        // ĐỊNH DẠNG DÒNG TIÊU ĐỀ (DÒNG 1) IN ĐẬM VÀ CĂN GIỮA
+        const headerRange = XLSX.utils.decode_range(ws['!ref']);
+        for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
+            if (!ws[cellAddress]) continue;
+            ws[cellAddress].s = {
+                font: { bold: true },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+        }
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "VoSinh_DaCoMaVTF");
+        XLSX.writeFile(wb, "VoSinh_DaCoMaVTF.xlsx");
     }
 
     window.onload = startRealtimeListener;
