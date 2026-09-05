@@ -355,12 +355,13 @@
             <td>
                 <select class="form-select input-culture">
                     <option value="" ${!data.culture ? 'selected' : ''}>Chọn</option>
-                    <option value="Mầm non" ${data.culture === 'Mầm non' ? 'selected' : ''}>Mầm non</option>
-                    <option value="Tiểu học" ${data.culture === 'Tiểu học' ? 'selected' : ''}>Tiểu học</option>
-                    <option value="THCS" ${data.culture === 'THCS' ? 'selected' : ''}>THCS</option>
-                    <option value="THPT" ${data.culture === 'THPT' ? 'selected' : ''}>THPT</option>
-                    <option value="Đại học" ${data.culture === 'Đại học' ? 'selected' : ''}>Đại học</option>
-                    <option value="Khác" ${data.culture === 'Khác' ? 'selected' : ''}>Khác</option>
+                    <option value="Cấp 1" ${data.culture === 'Cấp 1' ? 'selected' : ''}>Cấp 1</option>
+                    <option value="Cấp 2" ${data.culture === 'Cấp 2' ? 'selected' : ''}>Cấp 2</option>
+                    <option value="12/12" ${data.culture === '12/12' ? 'selected' : ''}>12/12</option>
+		    <option value="Trung cấp" ${data.culture === 'Trung cấp' ? 'selected' : ''}>Trung cấp</option>
+                    <option value="Cao đẳng" ${data.culture === 'Cao đẳng' ? 'selected' : ''}>Cao đẳng</option>
+		    <option value="Đại học" ${data.culture === 'Đại học' ? 'selected' : ''}>Đại học</option>
+                    
                 </select>
             </td>
             <td style="text-align: center;">
@@ -420,8 +421,8 @@
     function downloadExcelTemplate() {
         const sampleData = [
             ["HỌ VÀ TÊN", "NGÀY SINH", "GIỚI TÍNH", "CCCD", "ĐỊA CHỈ", "VĂN HÓA"],
-            ["Nguyễn Văn A", "12/05/2012", "Nam", "001202001234", "Hà Nội", "Tiểu học"],
-            ["Trần Thị B", "20/08/2010", "Nữ", "001204005678", "Hà Nội", "THCS"]
+            ["Nguyễn Văn A", "12/05/2012", "Nam", "001202001234", "Hà Nội", "Cấp 1"],
+            ["Trần Thị B", "20/08/2010", "Nữ", "001204005678", "Hà Nội", "Cấp 2"]
         ];
         const ws = XLSX.utils.aoa_to_sheet(sampleData);
 
