@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- SheetJS (Xuất Excel chuẩn định dạng cột và style) -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -60,17 +58,70 @@
         .section-title { font-size: 16px; font-weight: 700; color: var(--primary-color); margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
         .section-title-left { display: flex; align-items: center; gap: 10px; }
 
-        .btn-download { background-color: var(--success-color); color: white; border: none; padding: 6px 14px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn-download:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-download.accent { background-color: var(--accent-color); }
-
         .btn-delete { background-color: transparent; color: var(--danger-color); border: 1px solid var(--danger-color); padding: 4px 8px; font-size: 12px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
         .btn-delete:hover { background-color: var(--danger-color); color: white; }
+        .btn-edit {
+            background-color: transparent;
+            color: var(--warning-color);
+            border: 1px solid var(--warning-color);
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 4px;
+        }
+        .btn-edit:hover {
+            background-color: var(--warning-color);
+            color: #000;
+        }
 
+        /* Styling cho ô nhập trực tiếp trong bảng */
+        .edit-input {
+            width: 100%;
+            padding: 4px 6px;
+            font-size: 13px;
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .edit-input:focus {
+            box-shadow: 0 0 4px rgba(13, 110, 253, 0.4);
+        }
+
+        /* Nút Lưu */
+        .btn-save {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 4px;
+        }
+
+        /* Nút Hủy */
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-save:hover { opacity: 0.85; }
+        .btn-cancel:hover { opacity: 0.85; }
         .table-responsive { width: 100%; overflow: auto; max-height: 500px; border: 1px solid var(--border-color); border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         
-        /* Đã cập nhật text-align: center cho dòng tiêu đề bảng */
         th { background-color: #f1f5f9; color: #334155; font-weight: 700; text-transform: uppercase; padding: 10px 12px; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); text-align: center; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
         td { padding: 9px 12px; border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); vertical-align: middle; }
         th:last-child, td:last-child { border-right: none; }
@@ -93,10 +144,7 @@
 <div class="container">
     <div class="header">
         <h1><i class="fa-solid fa-list-check"></i> DANH SÁCH ĐĂNG KÝ</h1>
-        <div class="status-container">
-            <span class="realtime-indicator"><span class="pulse-dot"></span> REALTIME FIREBASE</span>
-            <span class="gsheet-indicator" id="gsheetStatus"><i class="fa-solid fa-file-excel"></i> AUTO SYNC GOOGLE SHEETS</span>
-        </div>
+        <div class="status-container"></div>
     </div>
 
     <div class="stats-grid">
@@ -125,7 +173,6 @@
 
     <div id="loadingStatus" class="loading-box">
         <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
-        <div style="margin-top: 10px;">Đang kết nối nhận dữ liệu trực tiếp...</div>
     </div>
 
     <div id="contentContainer" style="display: none;">
@@ -145,9 +192,6 @@
                         <i class="fa-solid fa-user-plus" style="color: var(--success-color);"></i>
                         <span>Danh sách cấp mã</span>
                     </div>
-                    <button class="btn-download" onclick="downloadVoSinhMoi()">
-                        <i class="fa-solid fa-file-excel"></i> Tải về Excel
-                    </button>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -177,9 +221,6 @@
                         <i class="fa-solid fa-id-badge" style="color: var(--accent-color);"></i>
                         <span>Danh sách đã có mã</span>
                     </div>
-                    <button class="btn-download accent" onclick="downloadVoSinhCoMa()">
-                        <i class="fa-solid fa-file-excel"></i> Tải về Excel
-                    </button>
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -248,6 +289,26 @@
         return str;
     }
 
+    function formatDateForInput(dateStr) {
+        if (!dateStr) return '';
+        const str = String(dateStr).trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) {
+            const parts = str.split('/');
+            const day = parts[0].padStart(2, '0');
+            const month = parts[1].padStart(2, '0');
+            const year = parts[2];
+            return `${year}-${month}-${day}`;
+        }
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            return `${d.getFullYear()}-${month}-${day}`;
+        }
+        return '';
+    }
+
     function startRealtimeListener() {
         const loadingBox = document.getElementById('loadingStatus');
         const contentContainer = document.getElementById('contentContainer');
@@ -285,9 +346,6 @@
     async function autoSyncToGoogleSheet(voSinhMoi, voSinhCoMa) {
         if (!GOOGLE_SCRIPT_URL) return;
 
-        const gsheetStatus = document.getElementById("gsheetStatus");
-        gsheetStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ĐANG ĐỒNG BỘ GOOGLE SHEETS...`;
-
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
@@ -295,41 +353,123 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ voSinhMoi, voSinhDaCoMa: voSinhCoMa })
             });
-            gsheetStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> ĐÃ ĐỒNG BỘ GOOGLE SHEETS`;
         } catch (error) {
             console.error("Lỗi đồng bộ Google Sheets:", error);
-            gsheetStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> LỖI ĐỒNG BỘ SHEET`;
         }
     }
+
+    let editingKeyMoi = null;
 
     function renderTableMoi(dataList) {
         const tbMoi = document.getElementById('tb-vosinh-moi');
         if (!dataList.length) {
-            tbMoi.innerHTML = '<tr><td colspan="9" class="empty-row">Không có dữ liệu võ sinh mới</td></tr>';
+            tbMoi.innerHTML = '<tr><td colspan="9" class="empty-row">Không có dữ liệu</td></tr>';
             return;
         }
 
-        tbMoi.innerHTML = dataList.map((item, index) => `
-            <tr>
-                <td class="stt-col">${index + 1}</td>
-                <td><span class="badge badge-location">${item.diemTap || '---'}</span></td>
-                <td><strong>${item.name || '---'}</strong></td>
-                <td>${formatDate(item.dob)}</td>
-                <td>${item.gender || '---'}</td>
-                <td>${item.cccd || '---'}</td>
-                <td>${item.address || '---'}</td>
-                <td>${item.culture || '---'}</td>
-                <td class="action-col">
-                    
-                </td>
-            </tr>
-        `).join('');
+        tbMoi.innerHTML = dataList.map((item, index) => {
+            if (editingKeyMoi === item._key) {
+                return `
+                    <tr id="edit-row-${item._key}">
+                        <td class="stt-col">${index + 1}</td>
+                        <td><input type="text" class="edit-input" id="edit-diemTap" value="${item.diemTap || ''}" placeholder="Điểm tập"></td>
+                        <td><input type="text" class="edit-input" id="edit-name" value="${item.name || ''}" placeholder="Họ và tên"></td>
+                        <td><input type="date" class="edit-input" id="edit-dob" value="${formatDateForInput(item.dob)}"></td>
+                        <td>
+                            <select class="edit-input" id="edit-gender">
+                                <option value="Nam" ${item.gender === 'Nam' ? 'selected' : ''}>Nam</option>
+                                <option value="Nữ" ${item.gender === 'Nữ' ? 'selected' : ''}>Nữ</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="edit-input" id="edit-cccd" value="${item.cccd || ''}" placeholder="CCCD"></td>
+                        <td><input type="text" class="edit-input" id="edit-address" value="${item.address || ''}" placeholder="Địa chỉ"></td>
+                        <td><input type="text" class="edit-input" id="edit-culture" value="${item.culture || ''}" placeholder="Văn hóa"></td>
+                        <td class="action-col" style="white-space: nowrap;">
+                            <button type="button" class="btn-save" onclick="saveStudentMoi('${item._key}')">
+                                <i class="fa-solid fa-check"></i> Lưu
+                            </button>
+                            <button type="button" class="btn-cancel" onclick="cancelEditMoi()">
+                                <i class="fa-solid fa-xmark"></i> Hủy
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            return `
+                <tr>
+                    <td class="stt-col">${index + 1}</td>
+                    <td><span class="badge badge-location">${item.diemTap || '---'}</span></td>
+                    <td><strong>${item.name || '---'}</strong></td>
+                    <td>${formatDate(item.dob)}</td>
+                    <td>${item.gender || '---'}</td>
+                    <td>${item.cccd || '---'}</td>
+                    <td>${item.address || '---'}</td>
+                    <td>${item.culture || '---'}</td>
+                    <td class="action-col" style="white-space: nowrap;">
+                        <button type="button" class="btn-edit" onclick="enableEditMoi('${item._key}')">
+                            <i class="fa-solid fa-pen-to-square"></i> Sửa
+                        </button>
+                        <button type="button" class="btn-delete" onclick="deleteStudent('voSinhMoi', '${item._key}', '${item.name || ''}')">
+                            <i class="fa-solid fa-trash-can"></i> Xóa
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function enableEditMoi(key) {
+        editingKeyMoi = key;
+        renderTableMoi(currentVoSinhMoi);
+    }
+
+    function cancelEditMoi() {
+        editingKeyMoi = null;
+        renderTableMoi(currentVoSinhMoi);
+    }
+
+    async function saveStudentMoi(key) {
+        const item = currentVoSinhMoi.find(s => s._key === key);
+
+        const diemTap = document.getElementById('edit-diemTap').value.trim();
+        const name = document.getElementById('edit-name').value.trim();
+        let dob = document.getElementById('edit-dob').value;
+        const gender = document.getElementById('edit-gender').value;
+        const cccd = document.getElementById('edit-cccd').value.trim();
+        const address = document.getElementById('edit-address').value.trim();
+        const culture = document.getElementById('edit-culture').value.trim();
+
+        if (!name) {
+            alert("Họ và tên không được để trống!");
+            return;
+        }
+
+        if (!dob && item) {
+            dob = item.dob || '';
+        }
+
+        const updatedData = { diemTap, name, dob, gender, cccd, address, culture };
+
+        try {
+            editingKeyMoi = null; 
+            if (item) {
+                Object.assign(item, updatedData);
+            }
+            renderTableMoi(currentVoSinhMoi);
+            await database.ref(`voSinhMoi/${key}`).update(updatedData);
+        } catch (error) {
+            console.error("Lỗi cập nhật:", error);
+            alert("Lỗi khi lưu dữ liệu: " + error.message);
+            editingKeyMoi = key;
+            renderTableMoi(currentVoSinhMoi);
+        }
     }
 
     function renderTableCoMa(dataList) {
         const tbCoMa = document.getElementById('tb-vosinh-coma');
         if (!dataList.length) {
-            tbCoMa.innerHTML = '<tr><td colspan="8" class="empty-row">Không có dữ liệu võ sinh đã có mã VTF</td></tr>';
+            tbCoMa.innerHTML = '<tr><td colspan="8" class="empty-row">Không có dữ liệu</td></tr>';
             return;
         }
 
@@ -343,7 +483,9 @@
                 <td>${formatDate(item.dob)}</td>
                 <td><span class="badge badge-cap">${item.targetCap || '---'}</span></td>
                 <td class="action-col">
-                   
+                    <button type="button" class="btn-delete" onclick="deleteStudent('voSinhCoMa', '${item._key}', '${item.name || ''}')">
+                        <i class="fa-solid fa-trash-can"></i> Xóa
+                    </button>
                 </td>
             </tr>
         `).join('');
@@ -351,7 +493,7 @@
 
     async function deleteStudent(path, key, name) {
         if (!key) return;
-        const confirmDelete = confirm(`⚠️ BẠN CÓ CHẮC CHẮN MUỐN XÓA?\n\nVõ sinh: ${name || 'N/A'}\n\nDữ liệu sẽ bị xóa khỏi hệ thống và đồng bộ lại tự động.`);
+        const confirmDelete = confirm(`⚠️ BẠN CÓ CHẮC CHẮN XÓA?\n\nVõ sinh: ${name || 'N/A'}\n\nDữ liệu sẽ bị xóa khỏi hệ thống và đồng bộ lại tự động.`);
         if (!confirmDelete) return;
 
         try {
@@ -360,89 +502,6 @@
             console.error("Lỗi xóa bản ghi:", error);
             alert("Lỗi khi xóa dữ liệu: " + error.message);
         }
-    }
-
-    // TẢI FILE EXCEL CẤP MÃ MỚI - Định dạng dòng 1 chữ đậm & căn giữa
-    function downloadVoSinhMoi() {
-        if (!currentVoSinhMoi.length) {
-            alert("Chưa có dữ liệu Võ sinh cấp mã mới để tải về!");
-            return;
-        }
-
-        const excelData = [
-            ["STT", "Điểm tập", "Họ và tên", "Ngày sinh", "Giới tính", "CCCD", "Địa chỉ", "Văn hóa"]
-        ];
-
-        currentVoSinhMoi.forEach((item, index) => {
-            excelData.push([
-                index + 1,
-                item.diemTap || '---',
-                item.name || '---',
-                formatDate(item.dob),
-                item.gender || '---',
-                item.cccd ? String(item.cccd) : '---',
-                item.address || '---',
-                item.culture || '---'
-            ]);
-        });
-
-        const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-        // ĐỊNH DẠNG DÒNG TIÊU ĐỀ (DÒNG 1) IN ĐẬM VÀ CĂN GIỮA
-        const headerRange = XLSX.utils.decode_range(ws['!ref']);
-        for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
-            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
-            if (!ws[cellAddress]) continue;
-            ws[cellAddress].s = {
-                font: { bold: true },
-                alignment: { horizontal: "center", vertical: "center" }
-            };
-        }
-
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "VoSinh_CapMaMoi");
-        XLSX.writeFile(wb, "VoSinh_CapMaMoi.xlsx");
-    }
-
-    // TẢI FILE EXCEL ĐÃ CÓ MÃ VTF - Định dạng dòng 1 chữ đậm & căn giữa
-    function downloadVoSinhCoMa() {
-        if (!currentVoSinhCoMa.length) {
-            alert("Chưa có dữ liệu Võ sinh đã có mã VTF để tải về!");
-            return;
-        }
-
-        const excelData = [
-            ["STT", "Điểm tập", "Mã VTF", "Họ và tên", "Giới tính", "Ngày sinh", "Cấp dự thi"]
-        ];
-
-        currentVoSinhCoMa.forEach((item, index) => {
-            excelData.push([
-                index + 1,
-                item.diemTap || '---',
-                item.id || '---',
-                item.name || '---',
-                item.gender || '---',
-                formatDate(item.dob),
-                item.targetCap || '---'
-            ]);
-        });
-
-        const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-        // ĐỊNH DẠNG DÒNG TIÊU ĐỀ (DÒNG 1) IN ĐẬM VÀ CĂN GIỮA
-        const headerRange = XLSX.utils.decode_range(ws['!ref']);
-        for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
-            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
-            if (!ws[cellAddress]) continue;
-            ws[cellAddress].s = {
-                font: { bold: true },
-                alignment: { horizontal: "center", vertical: "center" }
-            };
-        }
-
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "VoSinh_DaCoMaVTF");
-        XLSX.writeFile(wb, "VoSinh_DaCoMaVTF.xlsx");
     }
 
     window.onload = startRealtimeListener;

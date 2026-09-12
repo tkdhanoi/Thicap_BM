@@ -122,7 +122,7 @@
 
     <div id="loadingStatus" class="loading-box" style="display: none;">
         <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
-        <div style="margin-top: 10px;">Đang tải dữ liệu kết quả từ sheet KQThi...</div>
+        
     </div>
 
     <div class="section-card" id="contentContainer">
@@ -185,7 +185,7 @@
                 gioiTinh: row[4] || '---',
                 ngaySinh: formatDate(row[5]),
                 capThi: row[6] || '---',
-                ketQua: row[7] || 'Đạt'
+                ketQua: row[7] || ' '
             }));
 
             populateDiemTapDropdown(allStudents);
