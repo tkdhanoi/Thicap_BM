@@ -17,6 +17,7 @@
     <style>
         :root {
             --sidebar-width: 260px;
+            --sidebar-collapsed-width: 70px;
             --primary-color: #1e3c72;
             --primary-dark: #122549;
             --accent-color: #3498db;
@@ -27,6 +28,7 @@
             --text-dark: #333333;
             --bg-body: #f4f7f6;
             --border-color: #e2e8f0;
+            --transition-speed: 0.3s;
         }
 
         * {
@@ -52,15 +54,25 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: all 0.3s ease;
+            transition: width var(--transition-speed) ease;
             z-index: 100;
             box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            flex-shrink: 0;
         }
 
+        /* Khi Sidebar ở trạng thái Thu nhỏ (Collapsed) */
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        /* Header của Sidebar */
         .sidebar-header {
             padding: 24px 16px;
             text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .logo-img {
@@ -71,6 +83,22 @@
             margin-bottom: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             border: 3px solid #fff;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .sidebar.collapsed .logo-img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 0;
+            border-width: 2px;
+        }
+
+        .brand-titles {
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        .sidebar.collapsed .brand-titles {
+            display: none;
         }
 
         .sidebar-header h1 {
@@ -89,11 +117,41 @@
             margin-top: 4px;
         }
 
+        /* Nút Thu nhỏ / Mở rộng Sidebar Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            z-index: 101;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .toggle-btn:hover {
+            background-color: var(--accent-color);
+        }
+
+        .sidebar.collapsed .toggle-btn i {
+            transform: rotate(180deg);
+        }
+
+        /* Navigation Menu */
         .sidebar-menu {
             list-style: none;
             padding: 15px 10px;
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .menu-item {
@@ -115,18 +173,36 @@
             cursor: pointer;
             text-align: left;
             transition: all 0.25s ease;
+            white-space: nowrap;
         }
 
         .nav-btn i {
             font-size: 16px;
-            width: 20px;
+            min-width: 20px;
             text-align: center;
+        }
+
+        .nav-btn span {
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        .sidebar.collapsed .nav-btn span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-btn {
+            justify-content: center;
+            padding: 12px 0;
         }
 
         .nav-btn:hover {
             background: rgba(255, 255, 255, 0.1);
             color: #ffffff;
             transform: translateX(4px);
+        }
+
+        .sidebar.collapsed .nav-btn:hover {
+            transform: none;
         }
 
         .nav-btn.active {
@@ -140,9 +216,12 @@
         .nav-btn.list.active { background-color: var(--success-color); }
         .nav-btn.result.active { background-color: var(--warning-color); }
 
+        /* Footer Sidebar */
         .sidebar-footer {
             padding: 16px 10px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .btn-reset-exam {
@@ -160,6 +239,14 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+        }
+
+        .sidebar.collapsed .btn-reset-exam span {
+            display: none;
+        }
+
+        .sidebar.collapsed .btn-reset-exam {
+            padding: 10px 0;
         }
 
         .btn-reset-exam:hover {
@@ -241,6 +328,13 @@
                 transition: left 0.3s ease;
             }
             .sidebar.active { left: 0; }
+            .sidebar.collapsed { width: var(--sidebar-width); } /* Không thu nhỏ kiểu icon trên mobile */
+            .sidebar.collapsed .brand-titles,
+            .sidebar.collapsed .nav-btn span,
+            .sidebar.collapsed .btn-reset-exam span { display: inline-block; }
+            .sidebar.collapsed .logo-img { width: 80px; height: 80px; margin-bottom: 12px; }
+            .sidebar.collapsed .nav-btn { justify-content: flex-start; padding: 12px 16px; }
+            .toggle-btn { display: none; } /* Nút thu nhỏ icon chỉ hiển thị trên Desktop */
             .top-navbar { display: flex; }
         }
     </style>
@@ -249,35 +343,46 @@
 
     <!-- SIDEBAR LEFT -->
     <aside class="sidebar" id="sidebar">
+        <!-- Nút thu nhỏ/mở rộng sidebar trên Desktop -->
+        <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebarCollapse()" title="Thu nhỏ / Mở rộng">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
         <div>
             <div class="sidebar-header">
-                <img src="logo.jpg" alt="Logo Taekwondo" class="logo-img">
-                <h1>CLB TAEKWONDO BẠCH MAI</h1>
-                <h2>Quản Lý Thi Cấp</h2>
+                <img src="logo.jpg" alt="Logo Taekwondo" class="logo-img" onerror="this.style.display='none'">
+                <div class="brand-titles">
+                    <h1>CLB TAEKWONDO BẠCH MAI</h1>
+                    <h2>Quản Lý Thi Cấp</h2>
+                </div>
             </div>
 
             <ul class="sidebar-menu">
                 <li class="menu-item">
-                    <button type="button" onclick="loadPage('dangky.html', this)" class="nav-btn register">
-                        <i class="fa-solid fa-pen-to-square"></i> Đăng Ký
+                    <button type="button" onclick="loadPage('dangky.html', this)" class="nav-btn register" title="Đăng Ký">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Đăng Ký</span>
                     </button>
                 </li>
                 <li class="menu-item">
-                    <button type="button" onclick="loadPage('danhsach.html', this)" class="nav-btn list">
-                        <i class="fa-solid fa-list-check"></i> Danh Sách
+                    <button type="button" onclick="loadPage('danhsach.html', this)" class="nav-btn list" title="Danh Sách">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Danh Sách</span>
                     </button>
                 </li>
                 <li class="menu-item">
-                    <button type="button" onclick="loadPage('ketqua.html', this)" class="nav-btn result">
-                        <i class="fa-solid fa-award"></i> Kết Quả
+                    <button type="button" onclick="loadPage('ketqua.html', this)" class="nav-btn result" title="Kết Quả">
+                        <i class="fa-solid fa-award"></i>
+                        <span>Kết Quả</span>
                     </button>
                 </li>
             </ul>
         </div>
 
         <div class="sidebar-footer">
-            <button type="button" class="btn-reset-exam" onclick="resetDataForNewExam()">
-                <i class="fa-solid fa-rotate-right"></i> Reset Kỳ Thi Mới
+            <button type="button" class="btn-reset-exam" onclick="resetDataForNewExam()" title="Reset Kỳ Thi Mới">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>Reset Kỳ Thi Mới</span>
             </button>
         </div>
     </aside>
@@ -286,7 +391,7 @@
     <main class="main-content">
         <!-- Top Navbar for Mobile -->
         <div class="top-navbar">
-            <button class="toggle-sidebar-btn" onclick="toggleSidebar()">
+            <button class="toggle-sidebar-btn" onclick="toggleSidebarMobile()">
                 <i class="fa-solid fa-bars"></i>
             </button>
             <span style="font-weight: 600;">CLB TAEKWONDO BẠCH MAI</span>
@@ -345,7 +450,13 @@
             }
         }
 
-        function toggleSidebar() {
+        // Bật/tắt thu nhỏ Sidebar trên Desktop (thành icon-only)
+        function toggleSidebarCollapse() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        // Bật/tắt ẩn/hiện Sidebar trên Mobile
+        function toggleSidebarMobile() {
             document.getElementById('sidebar').classList.toggle('active');
         }
 
